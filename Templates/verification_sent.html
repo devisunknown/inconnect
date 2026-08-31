@@ -2,32 +2,64 @@
 {% block title %}Verify your email - InConnect{% endblock %}
 {% block extra_head %}
 <style>
-    body { background-color: #eae6f4; background-image: radial-gradient(#1b1b24 1px, transparent 1px); background-size: 20px 20px; }
+    body { background-color: #ffd11a; background-image: radial-gradient(#000000 1px, transparent 1px); background-size: 20px 20px; }
 </style>
 {% endblock %}
 {% block body_classes %}min-h-screen flex flex-col font-body-md text-on-surface p-margin-page md:p-12 items-center justify-center{% endblock %}
 {% block content %}
-<div class="page-enter">
-<main class="w-full max-w-md bg-surface-off-white border-[3px] border-stroke-black p-8 neo-shadow rounded-xl flex flex-col gap-6 relative text-center">
-    <div class="absolute -top-[15px] -left-[3px] bg-neon-lime border-[3px] border-stroke-black px-4 py-1 font-label-md text-label-md text-on-surface neo-shadow z-10 rounded-t-lg">
+<div class="page-enter w-full flex flex-col items-center">
+<main class="w-full max-w-2xl bg-surface-off-white border-[4px] border-stroke-black rounded-[28px] neo-shadow p-6 md:p-8 relative overflow-hidden">
+    <div class="absolute -top-4 left-6 bg-neon-lime border-[3px] border-stroke-black px-4 py-1 font-label-md text-label-md text-on-surface neo-shadow rounded-t-lg">
         EMAIL SENT
     </div>
-    <span class="material-symbols-outlined mx-auto mt-4 text-6xl bg-neon-lime border-[3px] border-stroke-black rounded-full p-4 neo-shadow" style="font-variation-settings: 'FILL' 1;">mark_email_read</span>
-    <div>
-        <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface uppercase tracking-tight">Check your inbox</h1>
-        <p class="font-body-md text-body-md text-on-surface-variant mt-2">A verification email has been sent to <strong class="text-on-surface">{{ request.user.email }}</strong>.</p>
-        <p class="font-body-md text-body-md text-on-surface-variant mt-2">Open the link in the email to verify and fully secure your account. If you don't see it, check your spam folder.</p>
+    <div class="absolute top-6 right-6">
+        <span class="material-symbols-outlined inline-flex items-center justify-center w-12 h-12 bg-white border-[3px] border-stroke-black rounded-xl neo-shadow">mail</span>
     </div>
-    <form method="post" action="{% url 'resend_verification' %}" class="w-full flex flex-col gap-3">
-        {% csrf_token %}
-        <button type="submit" class="w-full py-4 bg-vivid-yellow border-[3px] border-stroke-black font-headline-sm text-headline-sm uppercase text-center neo-shadow active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all flex items-center justify-center gap-2">
-            Resend Verification Email
-            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">refresh</span>
-        </button>
-    </form>
-    <a href="{% url 'matches' %}" class="font-label-md text-label-md text-primary underline hover:bg-neon-lime transition-colors">
-        Skip for now — go to your matches
-    </a>
+    <div class="pt-10 md:pt-14">
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+            <div class="max-w-lg">
+                <h1 class="font-headline-lg-mobile md:font-headline-lg text-on-surface leading-[0.9] tracking-tight text-5xl md:text-6xl">
+                    Check your inbox.
+                </h1>
+                <p class="font-body-md text-body-md text-on-surface-variant mt-4 text-lg">
+                    A verification email has been sent to <strong class="text-on-surface">{{ request.user.email }}</strong>.
+                </p>
+            </div>
+            <div class="shrink-0">
+                <span class="inline-flex items-center justify-center w-20 h-20 bg-vivid-yellow border-[3px] border-stroke-black rounded-2xl neo-shadow text-4xl" style="font-variation-settings: 'FILL' 1;">mark_email_read</span>
+            </div>
+        </div>
+
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white border-[3px] border-stroke-black rounded-2xl neo-shadow p-5">
+                <div class="inline-flex items-center justify-center w-12 h-12 bg-neon-lime border-[3px] border-stroke-black rounded-xl neo-shadow mb-4">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+                </div>
+                <h2 class="font-headline-sm text-headline-sm text-on-surface">Step 1</h2>
+                <p class="font-body-md text-on-surface-variant mt-2">Open the email and tap the verification link.</p>
+            </div>
+            <div class="bg-white border-[3px] border-stroke-black rounded-2xl neo-shadow p-5">
+                <div class="inline-flex items-center justify-center w-12 h-12 bg-secondary-container border-[3px] border-stroke-black rounded-xl neo-shadow mb-4">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">lock_open</span>
+                </div>
+                <h2 class="font-headline-sm text-headline-sm text-on-surface">Step 2</h2>
+                <p class="font-body-md text-on-surface-variant mt-2">Come back here once your email is confirmed.</p>
+            </div>
+        </div>
+
+        <div class="mt-8 flex flex-col gap-3">
+            <form method="post" action="{% url 'resend_verification' %}" class="w-full">
+                {% csrf_token %}
+                <button type="submit" class="w-full py-4 bg-vivid-yellow border-[3px] border-stroke-black font-headline-sm text-headline-sm uppercase text-center neo-shadow active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all flex items-center justify-center gap-2 rounded-2xl">
+                    Resend Verification Email
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">refresh</span>
+                </button>
+            </form>
+            <a href="{% url 'matches' %}" class="text-center font-label-md text-label-md text-primary underline hover:bg-neon-lime transition-colors rounded-xl py-2">
+                Skip for now - go to your matches
+            </a>
+        </div>
+    </div>
 </main>
 <p class="mt-4 font-label-sm text-label-sm text-on-surface-variant text-center">© 2026 InConnect</p>
 </div>
