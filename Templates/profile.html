@@ -91,6 +91,13 @@
                         <span class="material-symbols-outlined">explore</span>
                         Find Matches
                     </a>
+                    <form id="delete-profile-form" method="post" action="{% url 'delete_profile' %}" class="flex-1 md:flex-none">
+                        {% csrf_token %}
+                        <button type="button" id="delete-profile-btn" class="w-full bg-[#ff6b6b] text-stroke-black font-label-md px-6 py-3 rounded-lg neo-border neo-shadow active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined">delete_forever</span>
+                            Delete Profile
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -211,17 +218,61 @@
     <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors rounded-xl" href="{% url 'matches' %}"><span class="material-symbols-outlined">groups</span></a>
     <a class="flex flex-col items-center justify-center bg-neon-lime text-stroke-black border-2 border-stroke-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] p-2 rounded-xl" href="{% url 'profile' %}"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span></a>
 </nav>
+<div id="delete-modal" class="fixed inset-0 z-[60] hidden items-center justify-center px-4">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+    <div class="relative w-full max-w-lg bg-surface rounded-2xl neo-border neo-shadow p-6 md:p-8">
+        <div class="flex items-start gap-4">
+            <div class="w-12 h-12 bg-[#ff6b6b] rounded-xl border-2 border-stroke-black flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-2xl text-stroke-black">warning</span>
+            </div>
+            <div class="space-y-2">
+                <h3 class="font-headline-sm text-headline-sm text-stroke-black">Delete your account?</h3>
+                <p class="font-body-md text-on-surface-variant">
+                    This will permanently remove your profile, chats, messages, and account data. This cannot be undone.
+                </p>
+            </div>
+        </div>
+        <div class="mt-6 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+            <button type="button" id="cancel-delete-btn" class="bg-surface text-stroke-black font-label-md px-5 py-3 rounded-lg neo-border neo-shadow-sm active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all">
+                Cancel
+            </button>
+            <button type="button" id="confirm-delete-btn" class="bg-[#ff6b6b] text-stroke-black font-label-md px-5 py-3 rounded-lg neo-border neo-shadow active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined">delete_forever</span>
+                Yes, delete it
+            </button>
+        </div>
+    </div>
+</div>
 {% include '_footer.html' %}
 </div>
 {% endblock %}
 {% block scripts %}
 <script>
+const deleteModal = document.getElementById('delete-modal');
+const deleteForm = document.getElementById('delete-profile-form');
 document.getElementById('change-photo-btn').addEventListener('click', function() {
     document.getElementById('avatar-input').click();
 });
 document.getElementById('avatar-input').addEventListener('change', function() {
     if (this.files && this.files.length) {
         document.getElementById('avatar-form').submit();
+    }
+});
+document.getElementById('delete-profile-btn').addEventListener('click', function(event) {
+    deleteModal.classList.remove('hidden');
+    deleteModal.classList.add('flex');
+});
+document.getElementById('cancel-delete-btn').addEventListener('click', function() {
+    deleteModal.classList.add('hidden');
+    deleteModal.classList.remove('flex');
+});
+document.getElementById('confirm-delete-btn').addEventListener('click', function() {
+    deleteForm.submit();
+});
+deleteModal.addEventListener('click', function(event) {
+    if (event.target === deleteModal || event.target === deleteModal.firstElementChild) {
+        deleteModal.classList.add('hidden');
+        deleteModal.classList.remove('flex');
     }
 });
 document.getElementById('edit-bio-btn').addEventListener('click', function() {

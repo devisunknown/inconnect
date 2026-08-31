@@ -27,6 +27,7 @@ urlpatterns = [
     path('search/users/', views.user_search, name='user_search'),
     path('respond-request/<int:request_id>/<str:action>/', views.respond_request, name='respond_request'),
     path('profile/', views.profile, name='profile'),
+    path('profile/delete/', views.delete_profile, name='delete_profile'),
     path('profile/avatar/', views.upload_avatar, name='upload_avatar'),
     path('profile/bio/', views.update_bio, name='update_bio'),
     path('profile/about/', views.update_about, name='update_about'),

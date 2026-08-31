@@ -311,6 +311,18 @@ def profile(request):
 
 
 @login_required
+def delete_profile(request):
+    if request.method != 'POST':
+        return redirect('profile')
+
+    user = request.user
+    username = user.username
+    user.delete()
+    django_messages.success(request, f"Your profile and account for @{username} were deleted.")
+    return redirect('welcome')
+
+
+@login_required
 def upload_avatar(request):
     profile, _ = Profile.objects.get_or_create(user=request.user)
     if request.method == 'POST' and request.FILES.get('avatar'):
