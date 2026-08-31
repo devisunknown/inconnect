@@ -112,7 +112,7 @@ tailwind.config = {
     .neo-border { border-width: 3px; border-color: #000000; border-style: solid; }
     .neo-input:focus { box-shadow: 5px 5px 0px 0px #4d44e3; }
     ::-webkit-scrollbar { display: none; }
-    body { min-height: max(884px, 100dvh); }
+    body { min-height: 100dvh; overflow-x: hidden; }
     body.chat-page { min-height: 0; height: 100dvh; overflow: hidden; }
     @supports (height: 100svh) {
         body.chat-page { height: 100svh; min-height: 100svh; }
@@ -141,7 +141,6 @@ tailwind.config = {
         .page-enter, .reveal, ::view-transition-old(root), ::view-transition-new(root) { animation: none !important; transition: none !important; }
         .reveal { opacity: 1; transform: none; }
     }
-</style>
 </style>
 {% block extra_head %}{% endblock %}
 </head>
