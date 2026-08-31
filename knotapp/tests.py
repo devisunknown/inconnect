@@ -1,74 +1,10 @@
 from django.contrib.auth import authenticate, get_user_model
-from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
 from django.core.cache import cache
 from django.test import Client, TestCase
 from django.urls import reverse
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
-
-from knotapp.models import Profile
 
 User = get_user_model()
-
-
-class EmailVerificationTests(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(
-            username='verifier', email='verify@example.com', password='pass12345'
-        )
-        self.profile, _ = Profile.objects.get_or_create(user=self.user)
-
-    def tearDown(self):
-        self.user.delete()
-
-    def build_link(self):
-        token = default_token_generator.make_token(self.user)
-        uid = urlsafe_base64_encode(force_bytes(self.user.pk))
-        return reverse('verify_email', args=[uid, token])
-
-    def test_signup_collects_email_and_sends_email(self):
-        self.client.post(reverse('signup'), {
-            'first_name': 'Jane', 'username': 'janedoe', 'email': 'jane@example.com',
-            'password1': 'strongpass123', 'password2': 'strongpass123',
-        })
-        created = User.objects.get(username='janedoe')
-        self.assertEqual(created.email, 'jane@example.com')
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertIn('verify-email', mail.outbox[0].body)
-
-    def test_verify_email_sets_flag(self):
-        self.assertFalse(self.profile.email_verified)
-        resp = self.client.get(self.build_link())
-        self.assertEqual(resp.status_code, 200)
-        self.profile.refresh_from_db()
-        self.assertTrue(self.profile.email_verified)
-        self.assertContains(resp, 'Email Verified')
-
-    def test_verify_email_rejects_bad_token(self):
-        uid = urlsafe_base64_encode(force_bytes(self.user.pk))
-        resp = self.client.get(reverse('verify_email', args=[uid, 'badtoken']))
-        self.assertEqual(resp.status_code, 200)
-        self.profile.refresh_from_db()
-        self.assertFalse(self.profile.email_verified)
-        self.assertContains(resp, 'Link Expired')
-
-    def test_resend_requires_login(self):
-        resp = self.client.post(reverse('resend_verification'), {})
-        self.assertEqual(resp.status_code, 302)
-        self.assertIn(reverse('login'), resp.get('Location'))
-        self.assertIn('resend-verification', resp.get('Location'))
-
-    def test_banner_shows_only_for_unverified(self):
-        client = Client()
-        client.force_login(self.user)
-        resp = client.get(reverse('matches'))
-        self.assertContains(resp, 'Verify your email to fully secure')
-
-        self.profile.email_verified = True
-        self.profile.save()
-        resp = client.get(reverse('matches'))
-        self.assertNotContains(resp, 'Verify your email to fully secure')
 
 
 class LoginSignupRateLimitTests(TestCase):

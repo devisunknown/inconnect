@@ -1,28 +1,16 @@
-import logging
-import threading
-
-from django.conf import settings
 from django.contrib import messages as django_messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm
 from django.contrib.auth.models import User
-from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import send_mail
 from django.db.models import Count, Prefetch, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.template.loader import render_to_string
-from django.utils.encoding import force_bytes, force_str
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views.decorators.http import require_POST
 from django_ratelimit.decorators import ratelimit
 
 from .forms import SignupForm
 from .models import Chat, ChatMember, FriendRequest, Interest, Message, Notification, Profile, UserPresence
-
-logger = logging.getLogger(__name__)
-
 
 def welcome(request):
     return render(request, 'welcome.html')
@@ -68,43 +56,11 @@ def signup_view(request):
                 user.email = email
             user.save()
             profile, _ = Profile.objects.get_or_create(user=user)
-            send_verification_email_async(user)
             login(request, user)
             return redirect('onboarding')
     else:
         form = SignupForm()
     return render(request, 'signup.html', {'form': form})
-
-
-def send_verification_email(user):
-    token = default_token_generator.make_token(user)
-    uid = urlsafe_base64_encode(force_bytes(user.pk))
-    verify_url = f"{settings.SITE_BASE_URL}/verify-email/{uid}/{token}/"
-    subject = 'Verify your email — InConnect'
-    html = render_to_string('emails/verify_email.html', {
-        'user': user,
-        'verify_url': verify_url,
-    })
-    try:
-        send_mail(
-            subject,
-            f'Verify your email by visiting: {verify_url}',
-            settings.DEFAULT_FROM_EMAIL,
-            [user.email],
-            html_message=html,
-        )
-    except Exception:
-        logger.warning('Failed to send verification email to %s', user.email, exc_info=True)
-
-
-def send_verification_email_async(user):
-    def _run():
-        try:
-            send_verification_email(user)
-        except Exception:
-            logger.warning('Failed to send verification email to %s', user.email, exc_info=True)
-    t = threading.Thread(target=_run, daemon=True)
-    t.start()
 
 
 @ratelimit(key='ip', rate='3/h', method='POST', block=False)
@@ -152,35 +108,6 @@ def password_reset_confirm(request, uidb64, token):
 
 def password_reset_complete(request):
     return render(request, 'registration/password_reset_complete.html')
-
-
-@login_required
-@require_POST
-@ratelimit(key='user', rate='1/m', method='POST', block=True)
-def resend_verification(request):
-    send_verification_email_async(request.user)
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        return JsonResponse({'ok': True, 'message': 'Verification email sent.'})
-    return redirect('verification_sent')
-
-
-@login_required
-def verification_sent(request):
-    return render(request, 'verification_sent.html')
-
-
-def verify_email(request, uidb64, token):
-    try:
-        uid = force_str(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-        user = None
-    valid = user is not None and default_token_generator.check_token(user, token)
-    if valid:
-        profile, _ = Profile.objects.get_or_create(user=user)
-        profile.email_verified = True
-        profile.save()
-    return render(request, 'email_verification.html', {'valid': valid, 'verified_email': user.email if valid else ''})
 
 
 @login_required

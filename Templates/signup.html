@@ -5,7 +5,7 @@
     body { background-color: #eae6f4; background-image: radial-gradient(#1b1b24 1px, transparent 1px); background-size: 20px 20px; }
 </style>
 {% endblock %}
-{% block body_classes %}min-h-screen flex flex-col font-body-md text-on-surface p-margin-page md:p-12 items-center justify-center{% endblock %}
+{% block body_classes %}min-h-screen flex flex-col font-body-md text-on-surface p-margin-page md:p-12 items-center justify-center overflow-x-hidden py-6 md:py-12{% endblock %}
 {% block content %}
 <div class="page-enter">
 <main class="w-full max-w-md bg-surface-off-white border-[3px] border-stroke-black p-6 neo-shadow rounded-xl flex flex-col gap-6 relative">
@@ -84,10 +84,6 @@
             Create Account
             <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">arrow_forward</span>
         </button>
-        <p class="font-label-sm text-label-sm text-on-surface-variant text-center flex items-center justify-center gap-1.5 -mt-2">
-            <span class="material-symbols-outlined text-sm">mark_email_unread</span>
-            We'll email you a verification link to confirm your address.
-        </p>
     </form>
     <div class="mt-4 pt-4 border-t-[3px] border-stroke-black text-center font-label-md text-label-md">
         Already have an account?

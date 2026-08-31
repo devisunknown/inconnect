@@ -146,16 +146,6 @@ tailwind.config = {
 </head>
 <body class="bg-surface-off-white text-on-surface font-body-md {% block body_classes %}{% endblock %}">
 {% block content %}{% endblock %}
-{% if has_unverified_email %}
-<div class="fixed bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-md bg-primary-container text-white border-[3px] border-stroke-black rounded-xl neo-shadow p-4 z-[100] flex items-center gap-3">
-    <span class="material-symbols-outlined shrink-0 text-2xl" style="font-variation-settings: 'FILL' 1;">mark_email_unread</span>
-    <p class="flex-1 font-label-md text-label-md min-w-0">Verify your email to fully secure your account.</p>
-    <form method="post" action="{% url 'resend_verification' %}">
-        {% csrf_token %}
-        <button type="submit" class="shrink-0 bg-neon-lime text-stroke-black border-2 border-stroke-black rounded-lg px-3 py-2 font-label-sm text-label-sm neo-shadow-sm hover:bg-vivid-yellow transition-colors">Resend</button>
-    </form>
-</div>
-{% endif %}
 <script>
     /* Scroll-reveal on load + scroll (mobile-optimized via rAF + IO) */
     (function () {
