@@ -3,7 +3,7 @@ channels==4.3.2
 daphne==4.2.3
 asgiref==3.11.1
 whitenoise==6.12.0
-Pillow==10.2.0
+Pillow==11.0.0
 python-dotenv==1.2.3
 django-cloudinary-storage==0.3.0
 cloudinary==1.44.2
