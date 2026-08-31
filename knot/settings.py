@@ -31,7 +31,11 @@ SECRET_KEY = 'django-insecure-=vo$bzkev^4za*1$fgo($usm1*2$v$+o6@jetpt^q=d8^!+b55
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'true').lower() in ('1', 'true', 'yes')
 
-ALLOWED_HOSTS = [host.strip() for host in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if host.strip()]
+_allowed_hosts = [host.strip() for host in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if host.strip()]
+render_host = os.getenv('RENDER_EXTERNAL_HOSTNAME', '').strip()
+if render_host and render_host not in _allowed_hosts:
+    _allowed_hosts.append(render_host)
+ALLOWED_HOSTS = _allowed_hosts
 
 LOGIN_URL = '/login/'
 
