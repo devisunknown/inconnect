@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}Notifications - InConnect{% endblock %}
+{% block extra_head %}
+<style>
+    .neo-brutalism-shadow { box-shadow: 5px 5px 0px 0px #000000; }
+    .neo-brutalism-interaction:active { box-shadow: 0px 0px 0px 0px #000000; transform: translate(5px, 5px); }
+</style>
+{% endblock %}
+{% block body_classes %}bg-surface-off-white text-on-surface font-body-md min-h-screen flex flex-col pb-[80px]{% endblock %}
+{% block content %}
+<div class="page-enter">
+<header class="bg-surface-container w-full top-0 sticky z-50 border-b-[3px] border-stroke-black shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]">
+    <div class="flex justify-between items-center px-margin-page py-4 w-full z-50">
+        <a href="{% url 'messages' %}" class="flex items-center justify-center p-2 border-[3px] border-stroke-black bg-surface rounded-xl hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
+            <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">arrow_back</span>
+        </a>
+        <h1 class="font-headline-md text-headline-md font-black text-primary">Notifications</h1>
+        <button class="flex items-center justify-center p-2 border-[3px] border-stroke-black bg-surface rounded-xl">
+            <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">notifications</span>
+        </button>
+    </div>
+</header>
+<main class="flex-grow px-margin-page py-6 max-w-3xl mx-auto w-full flex flex-col gap-gutter-md">
+    <div class="reveal flex flex-col gap-4">
+        <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface tracking-tighter">Your <span class="text-primary">Inbox.</span></h2>
+        <p class="font-body-md text-body-md text-on-surface-variant">Friend requests and important updates land here.</p>
+    </div>
+
+    {% if not pending_requests and not system_updates and not request_notifs %}
+    <div class="reveal bg-surface border-[3px] border-stroke-black rounded-xl neo-brutalism-shadow p-8 text-center">
+        <span class="material-symbols-outlined text-5xl text-primary" style="font-variation-settings: 'FILL' 1;">notifications_none</span>
+        <h3 class="font-headline-sm text-headline-sm mt-3 mb-1">You're all caught up</h3>
+        <p class="font-body-md text-on-surface-variant mb-4">Friend requests and system updates will show up here.</p>
+        <a href="{% url 'matches' %}" class="inline-block bg-vivid-yellow border-[3px] border-stroke-black px-6 py-3 font-label-md neo-brutalism-shadow">Find Friends</a>
+    </div>
+    {% endif %}
+
+    {% if pending_requests %}
+    <div class="flex flex-col gap-4 mt-2">
+        <h3 class="font-label-md text-label-md text-on-surface-variant tracking-wide">FRIEND REQUESTS</h3>
+        {% for fr in pending_requests %}
+        <div class="reveal flex items-center gap-4 p-4 bg-surface border-[3px] border-stroke-black rounded-xl neo-brutalism-shadow">
+            <div class="relative flex-shrink-0">
+                <div class="w-14 h-14 rounded-full border-[3px] border-stroke-black overflow-hidden bg-surface-container">
+                    {% if fr.from_user.profile.avatar %}
+                    <img class="w-full h-full object-cover" src="{{ fr.from_user.profile.avatar.url }}" alt=""/>
+                    {% else %}
+                    <div class="w-full h-full bg-secondary-container flex items-center justify-center">
+                        <span class="material-symbols-outlined text-2xl">person</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="flex-grow min-w-0">
+                <h4 class="font-headline-sm text-headline-sm truncate">{{ fr.from_user.profile.full_name }}</h4>
+                <p class="font-body-md text-body-md text-on-surface-variant truncate">Wants to connect</p>
+            </div>
+            <div class="flex flex-col gap-2 last:gap-0 md:flex-row">
+                <a href="{% url 'respond_request' fr.id 'accept' %}" class="bg-neon-lime text-stroke-black border-[3px] border-stroke-black rounded-lg px-4 py-2 font-label-md text-label-md text-center neo-brutalism-shadow neo-brutalism-interaction">Accept</a>
+                <a href="{% url 'respond_request' fr.id 'decline' %}" class="bg-surface-container text-stroke-black border-[3px] border-stroke-black rounded-lg px-4 py-2 font-label-md text-label-md text-center hover:bg-error-container transition-colors">Decline</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if request_notifs or system_updates %}
+    <div class="flex flex-col gap-4 mt-2">
+        <h3 class="font-label-md text-label-md text-on-surface-variant tracking-wide">UPDATES</h3>
+        {% for n in request_notifs %}
+        <div class="reveal flex items-center gap-3 p-4 bg-surface border-[3px] border-stroke-black rounded-xl">
+            <span class="material-symbols-outlined text-primary flex-shrink-0">person_add</span>
+            <div class="flex-grow min-w-0">
+                <p class="font-body-md text-body-md">{{ n.text }}</p>
+                <p class="font-label-sm text-label-sm text-on-surface-variant">{{ n.created_at|date:"M j, g:i A" }}</p>
+            </div>
+        </div>
+        {% endfor %}
+        {% for n in system_updates %}
+        <div class="reveal flex items-center gap-3 p-4 bg-surface border-[3px] border-stroke-black rounded-xl">
+            <span class="material-symbols-outlined text-primary flex-shrink-0">campaign</span>
+            <div class="flex-grow min-w-0">
+                <p class="font-body-md text-body-md">{{ n.text }}</p>
+                <p class="font-label-sm text-label-sm text-on-surface-variant">{{ n.created_at|date:"M j, g:i A" }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</main>
+</div>
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 bg-surface-container-highest border-t-[3px] border-stroke-black z-50 md:hidden">
+    <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors" href="{% url 'matches' %}"><span class="material-symbols-outlined text-primary">home</span></a>
+    <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors" href="{% url 'matches' %}"><span class="material-symbols-outlined text-primary">explore</span></a>
+    <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors" href="{% url 'messages' %}"><span class="material-symbols-outlined text-primary">chat</span></a>
+    <a class="flex flex-col items-center justify-center bg-neon-lime text-stroke-black border-2 border-stroke-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] p-2 rounded-xl" href="{% url 'notifications' %}"><span class="material-symbols-outlined text-stroke-black" style="font-variation-settings: 'FILL' 1;">notifications</span></a>
+    <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors" href="{% url 'profile' %}"><span class="material-symbols-outlined text-primary">person</span></a>
+</nav>
+{% include '_footer.html' %}
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block title %}{{ profile.full_name }} - InConnect{% endblock %}
+{% block extra_head %}
+<style>
+    .neo-shadow { box-shadow: 5px 5px 0px 0px rgba(0,0,0,1); }
+    .neo-shadow-sm { box-shadow: 3px 3px 0px 0px rgba(0,0,0,1); }
+    .folder-tab { position: relative; border-top: 3px solid black; border-left: 3px solid black; border-right: 3px solid black; border-top-left-radius: 8px; border-top-right-radius: 8px; margin-bottom: -3px; z-index: 10; padding: 4px 12px; display: inline-block; }
+    body { background-color: #fcf8ff; background-image: radial-gradient(#dcd8e5 1px, transparent 1px); background-size: 20px 20px; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-enter bg-background text-on-surface font-body-md antialiased pb-24 md:pb-0">
+<header class="bg-surface-container w-full top-0 sticky border-b-[3px] border-stroke-black shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] flex justify-between items-center px-margin-page py-4 z-50 transition-all hidden md:flex">
+    <a href="{% url 'matches' %}" class="text-primary hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all p-2 border-2 border-stroke-black rounded-lg neo-shadow-sm bg-surface">
+        <span class="material-symbols-outlined">hub</span>
+    </a>
+    <h1 class="font-headline-md text-headline-md font-black text-primary">InConnect</h1>
+    <a href="{% url 'messages' %}" class="text-primary hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all p-2 border-2 border-stroke-black rounded-lg neo-shadow-sm bg-surface">
+        <span class="material-symbols-outlined">chat</span>
+    </a>
+</header>
+<header class="md:hidden flex justify-between items-center px-margin-page py-4 sticky top-0 bg-background z-40 border-b-[3px] border-stroke-black mb-6">
+    <a href="{% url 'matches' %}" class="p-2 border-2 border-stroke-black rounded-lg neo-shadow-sm bg-surface"><span class="material-symbols-outlined">arrow_back</span></a>
+    <h1 class="font-headline-sm text-headline-sm font-black text-on-surface">Profile</h1>
+    <a href="{% url 'messages' %}" class="p-2 border-2 border-stroke-black rounded-lg neo-shadow-sm bg-surface"><span class="material-symbols-outlined">chat</span></a>
+</header>
+<main class="max-w-4xl mx-auto px-margin-page py-8 space-y-12">
+    <section class="relative">
+        <div class="absolute -top-4 -right-4 w-32 h-32 bg-secondary-container rounded-full border-4 border-stroke-black z-0 opacity-80 md:w-48 md:h-48 md:-right-8"></div>
+        <div class="relative z-10 bg-surface rounded-xl neo-border neo-shadow p-6 md:p-8 flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8">
+            <div class="relative shrink-0">
+                <div class="w-32 h-32 md:w-40 md:h-40 rounded-full border-[4px] border-stroke-black overflow-hidden neo-shadow bg-surface-variant">
+                    {% if profile.avatar %}
+                    <img class="w-full h-full object-cover" src="{{ profile.avatar.url }}" alt="Profile Picture"/>
+                    {% else %}
+                    <div class="w-full h-full bg-surface-container flex items-center justify-center">
+                        <span class="material-symbols-outlined text-6xl">person</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="absolute -bottom-2 -right-2 bg-neon-lime border-[3px] border-stroke-black rounded-full p-2 neo-shadow-sm">
+                    <span class="material-symbols-outlined text-stroke-black">verified</span>
+                </div>
+            </div>
+            <div class="flex-1 text-center md:text-left space-y-4 w-full">
+                <div>
+                    <h2 class="font-headline-lg-mobile md:font-headline-lg text-on-surface mb-1">{{ profile.full_name }}</h2>
+                    <p class="font-label-md text-on-surface-variant bg-surface-container inline-block px-3 py-1 rounded-md border-2 border-stroke-black">@{{ profile.user.username }}</p>
+                </div>
+                <p class="font-body-md text-on-surface max-w-lg mx-auto md:mx-0">
+                    {{ profile.bio|default:'This user hasn\'t added a bio yet.' }}
+                </p>
+                <div class="flex flex-wrap justify-center md:justify-start gap-4 pt-2">
+                    <div class="flex items-center gap-1 font-label-md text-on-surface">
+                        <span class="material-symbols-outlined">group</span>
+                        <span class="font-bold">{{ profile.interests.count }}</span> Interests
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                    {% if existing_chat_id %}
+                    <a href="{% url 'chat_room' existing_chat_id %}" class="bg-neon-lime text-stroke-black font-label-md px-6 py-3 rounded-lg neo-border neo-shadow active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all flex-1 md:flex-none flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">chat</span>
+                        Send Message
+                    </a>
+                    {% else %}
+                    <a href="{% url 'send_friend_request' viewing_user.id %}" class="bg-neon-lime text-stroke-black font-label-md px-6 py-3 rounded-lg neo-border neo-shadow active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all flex-1 md:flex-none flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">person_add</span>
+                        Add Friend
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'matches' %}" class="bg-surface text-stroke-black font-label-md px-6 py-3 rounded-lg neo-border neo-shadow active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all flex-1 md:flex-none flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                        Back
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+            <div class="folder-tab bg-tertiary-fixed-dim font-label-sm uppercase tracking-wider text-stroke-black">Interests</div>
+            <div class="bg-surface p-6 rounded-xl rounded-tl-none neo-border neo-shadow">
+                <div class="flex flex-wrap gap-3">
+                    {% for i in profile.interests.all %}
+                    <span class="bg-neon-lime text-stroke-black font-label-md px-4 py-2 rounded-md border-2 border-stroke-black neo-shadow-sm flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">{{ i.icon|default:'star' }}</span> {{ i.name }}
+                    </span>
+                    {% empty %}
+                    <p class="font-body-md text-on-surface-variant">No interests selected yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="folder-tab bg-primary-fixed-dim font-label-sm uppercase tracking-wider text-stroke-black">About</div>
+            <div class="bg-surface p-6 rounded-xl rounded-tl-none neo-border neo-shadow">
+                <ul class="space-y-4">
+                    <li class="flex items-center gap-4 p-3 bg-surface-container rounded-lg border-2 border-stroke-black">
+                        <div class="w-10 h-10 bg-vivid-yellow rounded-md border-2 border-stroke-black flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined">location_on</span>
+                        </div>
+                        <div>
+                            <h4 class="font-label-md">{{ profile.location|default:'Location not set' }}</h4>
+                            <p class="text-xs font-body-md text-on-surface-variant">Location</p>
+                        </div>
+                    </li>
+                    <li class="flex items-center gap-4 p-3 bg-surface-container rounded-lg border-2 border-stroke-black">
+                        <div class="w-10 h-10 bg-secondary-container rounded-md border-2 border-stroke-black flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined">interests</span>
+                        </div>
+                        <div>
+                            <h4 class="font-label-md">{{ profile.hobbies|default:'Hobbies not set' }}</h4>
+                            <p class="text-xs font-body-md text-on-surface-variant">Hobbies</p>
+                        </div>
+                    </li>
+                    <li class="flex items-center gap-4 p-3 bg-surface-container rounded-lg border-2 border-stroke-black">
+                        <div class="w-10 h-10 bg-primary-fixed-dim rounded-md border-2 border-stroke-black flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined">psychology</span>
+                        </div>
+                        <div>
+                            <h4 class="font-label-md">{{ profile.personality|default:'Not set' }}</h4>
+                            <p class="text-xs font-body-md text-on-surface-variant">Personality</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</main>
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 bg-surface-container-highest border-t-[3px] border-stroke-black z-50 md:hidden">
+    <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors rounded-xl" href="{% url 'matches' %}"><span class="material-symbols-outlined">home</span></a>
+    <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors rounded-xl" href="{% url 'matches' %}"><span class="material-symbols-outlined">explore</span></a>
+    <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors rounded-xl" href="{% url 'messages' %}"><span class="material-symbols-outlined">chat</span></a>
+    <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors rounded-xl" href="{% url 'matches' %}"><span class="material-symbols-outlined">groups</span></a>
+    <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors rounded-xl" href="{% url 'profile' %}"><span class="material-symbols-outlined">person</span></a>
+</nav>
+</div>
+{% endblock %}

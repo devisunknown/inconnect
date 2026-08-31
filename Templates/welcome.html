@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}InConnect - Welcome{% endblock %}
+{% block body_classes %}bg-surface text-on-surface h-full w-full flex flex-col font-body-md relative overflow-hidden{% endblock %}
+{% block content %}
+<div class="page-enter">
+<div class="absolute top-0 right-0 w-32 h-32 bg-neon-lime border-b-[3px] border-l-[3px] border-stroke-black rounded-bl-[100px] shadow-[0px_5px_0px_0px_rgba(0,0,0,1)] z-0 hidden md:block"></div>
+<div class="absolute bottom-1/4 left-0 w-16 h-16 bg-secondary-container border-t-[3px] border-r-[3px] border-b-[3px] border-stroke-black rounded-r-full shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] z-0"></div>
+<main class="flex-1 flex flex-col px-margin-page py-8 relative z-10 justify-between">
+<header class="flex justify-start items-center">
+    <div class="inline-flex items-center gap-2 bg-vivid-yellow border-[3px] border-stroke-black px-4 py-2 shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group_work</span>
+        <span class="font-headline-sm text-headline-sm tracking-tight">InConnect</span>
+    </div>
+</header>
+<div class="flex-1 flex flex-col justify-center gap-8 mt-12 mb-8">
+    <h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface leading-tight">
+        Connect<br/>
+        with your<br/>
+        <span class="bg-neon-lime px-2 border-[3px] border-stroke-black inline-block transform -rotate-2 shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]">tribe.</span>
+    </h1>
+    <p class="font-body-lg text-body-lg text-on-surface-variant max-w-sm">
+        Join a high-energy space where connections feel real, raw, and unfiltered.
+    </p>
+    <div class="relative w-full aspect-[4/3] bg-surface-off-white border-[3px] border-stroke-black shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] p-4 flex items-center justify-center overflow-hidden">
+        <div class="w-full h-full bg-primary-container border-[3px] border-stroke-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center">
+            <div class="flex flex-wrap items-center justify-center gap-4 p-4">
+                <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-vivid-yellow border-[3px] border-stroke-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center">
+                    <span class="material-symbols-outlined text-3xl md:text-4xl" style="font-variation-settings: 'FILL' 1;">face</span>
+                </div>
+                <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-secondary-container border-[3px] border-stroke-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center">
+                    <span class="material-symbols-outlined text-3xl md:text-4xl" style="font-variation-settings: 'FILL' 1;">person</span>
+                </div>
+                <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-neon-lime border-[3px] border-stroke-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center">
+                    <span class="material-symbols-outlined text-3xl md:text-4xl" style="font-variation-settings: 'FILL' 1;">face_3</span>
+                </div>
+                <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-primary-fixed-dim border-[3px] border-stroke-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center">
+                    <span class="material-symbols-outlined text-3xl md:text-4xl" style="font-variation-settings: 'FILL' 1;">person_4</span>
+                </div>
+            </div>
+        </div>
+        <div class="absolute -bottom-4 -right-4 bg-primary-container text-on-primary border-[3px] border-stroke-black p-3 rounded-full shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] transform -rotate-12 flex items-center justify-center">
+            <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">forum</span>
+        </div>
+    </div>
+</div>
+<div class="flex flex-col gap-4 mt-auto pb-4">
+    <a href="{% url 'signup' %}" class="text-center w-full bg-vivid-yellow text-on-surface border-[3px] border-stroke-black py-4 font-headline-sm text-headline-sm shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] hover:bg-surface-container-high transition-colors active:translate-x-[5px] active:translate-y-[5px] active:shadow-none flex items-center justify-center gap-2">
+        Get Started
+        <span class="material-symbols-outlined font-bold">arrow_forward</span>
+    </a>
+    <a href="{% url 'login' %}" class="text-center w-full bg-surface-off-white text-on-surface border-[3px] border-stroke-black py-4 font-headline-sm text-headline-sm shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] hover:bg-surface-container-high transition-colors active:translate-x-[5px] active:translate-y-[5px] active:shadow-none">
+        Sign In
+    </a>
+</div>
+</main>
+{% endblock %}

@@ -1,0 +1,242 @@
+{% extends 'base.html' %}
+{% block title %}Match Discovery - InConnect{% endblock %}
+{% block extra_head %}
+<style>
+    .neo-shadow { box-shadow: 5px 5px 0px 0px rgba(0,0,0,1); }
+    .neo-shadow-hover:hover { box-shadow: 2px 2px 0px 0px rgba(0,0,0,1); transform: translate(3px, 3px); }
+    .neo-shadow-active:active { box-shadow: 0px 0px 0px 0px rgba(0,0,0,1); transform: translate(5px, 5px); }
+    .folder-tab { position: absolute; top: -15px; left: -3px; height: 20px; width: 80px; border: 3px solid #000000; border-bottom: none; border-radius: 8px 8px 0 0; z-index: -1; }
+</style>
+{% endblock %}
+{% block body_classes %}bg-surface-container font-body-md text-on-surface min-h-screen flex flex-col md:flex-row pb-24 md:pb-0{% endblock %}
+{% block content %}
+<div class="page-enter">
+<header class="md:hidden flex justify-between items-center px-margin-page py-4 w-full z-50 bg-surface-container sticky top-0 shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] border-b-[3px] border-stroke-black">
+    <a href="{% url 'matches' %}" class="w-12 h-12 flex items-center justify-center border-[3px] border-stroke-black rounded-lg bg-surface-off-white neo-shadow">
+        <span class="material-symbols-outlined font-bold">hub</span>
+    </a>
+    <h1 class="font-headline-md text-headline-md font-black text-primary">InConnect</h1>
+    <button id="header-search-btn" class="w-12 h-12 flex items-center justify-center border-[3px] border-stroke-black rounded-lg bg-surface-off-white neo-shadow">
+        <span class="material-symbols-outlined font-bold">search</span>
+    </button>
+</header>
+<nav class="hidden md:flex flex-col w-64 bg-surface-container-highest border-r-[3px] border-stroke-black h-screen sticky top-0 px-4 py-8 z-50">
+    <div class="mb-10 text-center">
+        <h1 class="font-headline-md text-headline-md font-black text-primary">InConnect</h1>
+    </div>
+    <div class="flex flex-col gap-4 flex-grow">
+        <a class="flex items-center gap-3 p-3 rounded-xl text-on-surface hover:bg-vivid-yellow transition-colors font-label-md text-label-md" href="{% url 'matches' %}"><span class="material-symbols-outlined">home</span> Home</a>
+        <a class="flex items-center gap-3 p-3 rounded-xl bg-neon-lime text-stroke-black border-[3px] border-stroke-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] font-label-md text-label-md" href="{% url 'matches' %}"><span class="material-symbols-outlined">explore</span> Explore</a>
+        <a id="sidebar-search-btn" class="flex items-center gap-3 p-3 rounded-xl text-on-surface hover:bg-vivid-yellow transition-colors font-label-md text-label-md cursor-pointer"><span class="material-symbols-outlined">search</span> Search</a>
+        <a class="flex items-center gap-3 p-3 rounded-xl text-on-surface hover:bg-vivid-yellow transition-colors font-label-md text-label-md" href="{% url 'messages' %}"><span class="material-symbols-outlined">chat</span> Messages</a>
+        <a class="flex items-center gap-3 p-3 rounded-xl text-on-surface hover:bg-vivid-yellow transition-colors font-label-md text-label-md" href="{% url 'notifications' %}"><span class="material-symbols-outlined">notifications</span> Notifications</a>
+        <a class="flex items-center gap-3 p-3 rounded-xl text-on-surface hover:bg-vivid-yellow transition-colors font-label-md text-label-md" href="{% url 'logout' %}"><span class="material-symbols-outlined">logout</span> Logout</a>
+    </div>
+</nav>
+<main class="flex-1 px-margin-page py-6 md:py-10 max-w-5xl mx-auto w-full">
+    <div id="search-panel" class="hidden mb-8">
+        <div class="relative flex w-full">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <span class="material-symbols-outlined text-stroke-black">search</span>
+            </div>
+            <input id="user-search-input" class="w-full pl-12 pr-12 py-4 bg-surface border-[3px] border-stroke-black rounded-xl neo-shadow focus:outline-none focus:ring-0 font-label-md text-label-md text-stroke-black placeholder:text-outline" placeholder="Search for people by name or username..." type="text" autocomplete="off"/>
+            <button id="close-search-btn" class="absolute inset-y-0 right-0 pr-4 flex items-center" title="Close search">
+                <span class="material-symbols-outlined text-stroke-black">close</span>
+            </button>
+        </div>
+        <div id="search-results" class="mt-4 flex flex-col gap-3"></div>
+    </div>
+    <div class="mb-8 flex items-center gap-5">
+        <a href="{% url 'profile' %}" class="relative shrink-0 group">
+            <div class="w-20 h-20 md:w-24 md:h-24 rounded-full border-[3px] border-stroke-black overflow-hidden shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] bg-surface-container flex items-center justify-center">
+                {% if profile.avatar %}
+                <img class="w-full h-full object-cover" src="{{ profile.avatar.url }}" alt="Your profile"/>
+                {% else %}
+                <span class="material-symbols-outlined text-5xl text-outline">person</span>
+                {% endif %}
+            </div>
+            <div class="absolute -bottom-1 -right-1 bg-neon-lime border-[3px] border-stroke-black rounded-full p-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                <span class="material-symbols-outlined text-stroke-black text-sm">photo_camera</span>
+            </div>
+        </a>
+        <div>
+            <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-stroke-black mb-1">Find Your Match</h2>
+            <p class="font-body-lg text-body-lg text-on-surface-variant">Discover people who share your interests.</p>
+        </div>
+    </div>
+    {% if not matches %}
+    <div class="bg-surface-off-white border-[3px] border-stroke-black rounded-xl neo-shadow p-8 text-center mt-6">
+        <span class="material-symbols-outlined text-6xl text-primary mb-4" style="font-variation-settings: 'FILL' 1;">explore</span>
+        <h3 class="font-headline-sm text-headline-sm mb-2">No matches found yet</h3>
+        <p class="font-body-md text-on-surface-variant mb-6">Add interests or invite friends to find people who share your vibe.</p>        <a href="{% url 'onboarding' %}" class="inline-block bg-vivid-yellow border-[3px] border-stroke-black px-6 py-3 font-label-md neo-shadow hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all">Update Interests</a>
+    </div>
+    {% endif %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-gutter-md mt-6">
+        {% for m in matches %}
+        <div class="reveal relative bg-surface-off-white border-[3px] border-stroke-black rounded-xl neo-shadow p-5 flex flex-col gap-4 mt-4">
+            <div class="flex items-center gap-4">
+                <div class="relative shrink-0">
+                    <div class="w-16 h-16 rounded-full border-[3px] border-stroke-black overflow-hidden shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-surface-container flex items-center justify-center">
+                        {% if m.profile.avatar %}
+                        <img class="w-full h-full object-cover" src="{{ m.profile.avatar.url }}" alt="{{ m.profile.full_name }}"/>
+                        {% else %}
+                        <span class="material-symbols-outlined text-4xl text-outline">person</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between gap-2 mb-1">
+                        <h3 class="font-headline-sm text-headline-sm font-bold truncate">{{ m.profile.full_name }}</h3>
+                        <span class="shrink-0 bg-secondary-container text-stroke-black font-label-sm text-label-sm px-2 py-1 rounded-full border-[3px] border-stroke-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                            {{ m.score }}% Match
+                        </span>
+                    </div>
+                    <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">{{ m.profile.bio|default:'Looking for people who share their interests.' }}</p>
+                </div>
+            </div>
+            <div class="flex flex-col flex-grow justify-between">
+                <div class="flex flex-wrap gap-2 mb-4">
+                    {% for i in m.shared %}
+                    <span class="px-3 py-1 bg-neon-lime text-stroke-black border-[3px] border-stroke-black rounded-md font-label-sm text-label-sm">{{ i.name }}</span>
+                    {% endfor %}
+                </div>
+                <div class="flex gap-3">
+                    <a href="{% url 'public_profile' m.profile.user.id %}" class="flex-1 bg-white text-stroke-black border-[3px] border-stroke-black rounded-lg py-2 font-label-md text-label-md text-center neo-shadow hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all">View Profile</a>
+                    {% if m.existing_chat_id %}
+                    <a href="{% url 'chat_room' m.existing_chat_id %}" class="flex-1 bg-neon-lime text-stroke-black border-[3px] border-stroke-black rounded-lg py-2 font-label-md text-label-md text-center neo-shadow hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all">Message</a>
+                    {% else %}
+                    <a href="{% url 'send_friend_request' m.profile.user.id %}" class="flex-1 bg-neon-lime text-stroke-black border-[3px] border-stroke-black rounded-lg py-2 font-label-md text-label-md text-center neo-shadow hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all">Add Friend</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</main>
+</div>
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 bg-surface-container-highest border-t-[3px] border-stroke-black z-50">
+    <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors rounded-xl" href="{% url 'matches' %}"><span class="material-symbols-outlined">home</span></a>
+    <a class="flex flex-col items-center justify-center bg-neon-lime text-stroke-black border-2 border-stroke-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] p-2 rounded-xl" href="{% url 'matches' %}"><span class="material-symbols-outlined">explore</span></a>
+    <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors rounded-xl" href="{% url 'messages' %}"><span class="material-symbols-outlined">chat</span></a>
+    <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors rounded-xl" href="{% url 'notifications' %}"><span class="material-symbols-outlined">notifications</span></a>
+    <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors rounded-xl" href="{% url 'profile' %}"><span class="material-symbols-outlined">person</span></a>
+</nav>
+{% include '_footer.html' %}
+{% endblock %}
+{% block scripts %}
+<script>
+const searchPanel = document.getElementById('search-panel');
+const searchInput = document.getElementById('user-search-input');
+const searchResults = document.getElementById('search-results');
+
+function openSearch() {
+    searchPanel.classList.remove('hidden');
+    searchInput.focus();
+}
+function closeSearch() {
+    if (searchInput.value) {
+        searchInput.value = '';
+        searchResults.innerHTML = '';
+    }
+    searchPanel.classList.add('hidden');
+}
+document.getElementById('header-search-btn').addEventListener('click', openSearch);
+document.getElementById('sidebar-search-btn').addEventListener('click', openSearch);
+document.getElementById('close-search-btn').addEventListener('click', closeSearch);
+
+let searchTimer = null;
+searchInput.addEventListener('input', function() {
+    clearTimeout(searchTimer);
+    const q = searchInput.value.trim();
+    if (!q) {
+        searchResults.innerHTML = '';
+        return;
+    }
+    searchTimer = setTimeout(function() { runSearch(q); }, 250);
+});
+
+function esc(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+}
+
+function statusButton(u) {
+    if (u.status === 'accepted') {
+        return '<a href="' + URLS.startChat + u.id + '/" class="flex-1 bg-neon-lime text-stroke-black border-[3px] border-stroke-black rounded-lg py-2 font-label-md text-label-md text-center neo-shadow transition-all">Message</a>';
+    }
+    if (u.status === 'pending_sent') {
+        return '<span class="flex-1 bg-secondary-container text-stroke-black border-[3px] border-stroke-black rounded-lg py-2 font-label-md text-label-md text-center">Request Sent</span>';
+    }
+    if (u.status === 'pending_received') {
+        return '<a href="' + URLS.notifications + '" class="flex-1 bg-secondary-container text-stroke-black border-[3px] border-stroke-black rounded-lg py-2 font-label-md text-label-md text-center transition-all">Respond</a>';
+    }
+    return '<button data-add-friend="' + u.id + '" class="flex-1 bg-neon-lime text-stroke-black border-[3px] border-stroke-black rounded-lg py-2 font-label-md text-label-md text-center neo-shadow add-friend-btn transition-all">Add Friend</button>';
+}
+
+function renderResults(results) {
+    if (!results.length) {
+        searchResults.innerHTML = '<p class="font-body-md text-on-surface-variant text-center py-8">No people found. Try a different name.</p>';
+        return;
+    }
+    searchResults.innerHTML = results.map(function(u) {
+        return '<div class="bg-surface-off-white border-[3px] border-stroke-black rounded-xl neo-shadow p-4 flex items-center gap-4" data-username="' + esc(u.username) + '">' +
+            '<div class="relative shrink-0">' +
+                '<div class="w-14 h-14 rounded-full border-[3px] border-stroke-black overflow-hidden bg-surface-container flex items-center justify-center">' +
+                    (u.avatar ? '<img class="w-full h-full object-cover" src="' + esc(u.avatar) + '" alt=""/>' : '<span class="material-symbols-outlined text-3xl text-outline">person</span>') +
+                '</div>' +
+                '<span class="presence-dot absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-stroke-black ' + (u.online ? 'bg-neon-lime' : 'bg-outline') + '" data-online="' + (u.online ? '1' : '0') + '"></span>' +
+            '</div>' +
+            '<div class="flex-1 min-w-0">' +
+                '<h3 class="font-headline-sm text-headline-sm font-bold truncate">' + esc(u.full_name) + '</h3>' +
+                '<p class="font-body-md text-body-md text-on-surface-variant truncate">@' + esc(u.username) + (u.bio ? ' &middot; ' + esc(u.bio) : '') + '</p>' +
+            '</div>' +
+            '<div class="flex gap-2 flex-shrink-0 w-32 sm:w-40">' +
+                '<a href="' + URLS.publicProfile + u.id + '" class="flex-1 bg-white text-stroke-black border-[3px] border-stroke-black rounded-lg py-2 font-label-md text-label-md text-center neo-shadow transition-all">View</a>' +
+                statusButton(u) +
+            '</div>' +
+        '</div>';
+    }).join('');
+}
+
+async function runSearch(q) {
+    try {
+        const resp = await fetch(URLS.userSearch + '?q=' + encodeURIComponent(q), {headers: {'X-Requested-With': 'XMLHttpRequest'}});
+        const data = await resp.json();
+        renderResults(data.results);
+    } catch (e) {
+        searchResults.innerHTML = '<p class="font-body-md text-error text-center py-6">Search failed. Please try again.</p>';
+    }
+}
+
+const URLS = {
+    userSearch: '{% url "user_search" %}',
+    publicProfile: '{% url "public_profile" 0 %}'.replace('/0/', '/'),
+    startChat: '{% url "start_chat" 0 %}'.replace('/0/', '/'),
+    notifications: '{% url "notifications" %}',
+    sendFriendRequest: '{% url "send_friend_request" 0 %}'.replace('/0/', '/'),
+};
+
+searchResults.addEventListener('click', function(e) {
+    const btn = e.target.closest('.add-friend-btn');
+    if (!btn) return;
+    const id = btn.dataset.addFriend;
+    fetch(URLS.sendFriendRequest + id + '/', {method: 'GET'}).then(function() {
+        btn.outerHTML = '<span class="flex-1 bg-secondary-container text-stroke-black border-[3px] border-stroke-black rounded-lg py-2 font-label-md text-label-md text-center">Request Sent</span>';
+    });
+});
+
+const presenceSocket = new WebSocket((window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + '/ws/presence/');
+presenceSocket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+    if (data.type === 'presence_update') {
+        const card = searchResults.querySelector('[data-username="' + data.username + '"]');
+        if (card) {
+            const dot = card.querySelector('.presence-dot');
+            dot.classList.toggle('bg-neon-lime', data.online);
+            dot.classList.toggle('bg-outline', !data.online);
+        }
+    }
+};
+</script>
+{% endblock %}

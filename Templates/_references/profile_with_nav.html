@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>My Profile - InConnect</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500&amp;family=JetBrains+Mono:wght@600&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#c3c0ff",
+                        "surface-off-white": "#fbf8fc",
+                        "vivid-yellow": "#ffde59",
+                        "tertiary-fixed-dim": "#ffb596",
+                        "on-primary-container": "#d7d4ff",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#f0ecf9",
+                        "secondary": "#a8372a",
+                        "on-primary-fixed": "#0e0069",
+                        "on-primary": "#ffffff",
+                        "on-surface-variant": "#464555",
+                        "on-tertiary-fixed-variant": "#7c2e00",
+                        "outline-variant": "#c7c4d8",
+                        "neon-lime": "#96ff00",
+                        "surface-container-high": "#eae6f4",
+                        "secondary-fixed-dim": "#ffb4a8",
+                        "tertiary-fixed": "#ffdbcd",
+                        "stroke-black": "#000000",
+                        "inverse-on-surface": "#f3effc",
+                        "error": "#ba1a1a",
+                        "on-secondary-container": "#710e07",
+                        "on-tertiary-container": "#ffceba",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#f5f2ff",
+                        "inverse-surface": "#302f39",
+                        "surface": "#fcf8ff",
+                        "surface-bright": "#fcf8ff",
+                        "tertiary": "#7c2d00",
+                        "primary-fixed": "#e2dfff",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "on-surface": "#1b1b24",
+                        "primary-container": "#4d44e3",
+                        "secondary-container": "#ff7764",
+                        "secondary-fixed": "#ffdad4",
+                        "on-tertiary-fixed": "#360f00",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#4d44e3",
+                        "surface-container-highest": "#e4e1ee",
+                        "on-secondary": "#ffffff",
+                        "tertiary-container": "#a33e00",
+                        "on-secondary-fixed-variant": "#871f15",
+                        "error-container": "#ffdad6",
+                        "outline": "#777587",
+                        "on-background": "#1b1b24",
+                        "inverse-primary": "#c3c0ff",
+                        "surface-variant": "#e4e1ee",
+                        "on-secondary-fixed": "#410000",
+                        "background": "#fcf8ff",
+                        "primary": "#3323cc",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-dim": "#dcd8e5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter-md": "1.5rem",
+                        "margin-page": "1.25rem",
+                        "shadow-offset": "5px",
+                        "stroke-weight": "3px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["JetBrains Mono"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "label-md": ["JetBrains Mono"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-md": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["30px", { "lineHeight": "34px", "fontWeight": "800" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "24px", "fontWeight": "700" }],
+                        "headline-md": ["28px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "500" }],
+                        "headline-lg": ["36px", { "lineHeight": "40px", "letterSpacing": "-0.03em", "fontWeight": "800" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .neo-shadow { box-shadow: 5px 5px 0px 0px rgba(0,0,0,1); }
+        .neo-shadow-sm { box-shadow: 3px 3px 0px 0px rgba(0,0,0,1); }
+        .neo-shadow-hover:hover { transform: translate(2px, 2px); box-shadow: 3px 3px 0px 0px rgba(0,0,0,1); }
+        .neo-shadow-active:active { transform: translate(5px, 5px); box-shadow: 0px 0px 0px 0px rgba(0,0,0,1); }
+        .neo-border { border-width: 3px; border-color: #000000; border-style: solid; }
+        
+        /* Folder Tab Effect */
+        .folder-tab {
+            position: relative;
+            border-top: 3px solid black;
+            border-left: 3px solid black;
+            border-right: 3px solid black;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            margin-bottom: -3px; /* Overlap the border */
+            z-index: 10;
+            padding: 4px 12px;
+            display: inline-block;
+        }
+        
+        body {
+            background-color: #fcf8ff;
+            background-image: radial-gradient(#dcd8e5 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="bg-surface-container dark:bg-inverse-surface w-full top-0 sticky border-b-spacing-stroke-weight border-stroke-black dark:border-white shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] dark:shadow-[5px_5px_0px_0px_rgba(255,255,255,0.2)] flex justify-between items-center px-margin-page py-4 z-50 transition-all hidden md:flex">
+<button class="text-primary dark:text-primary-fixed-dim hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all active:translate-x-[5px] active:translate-y-[5px] active:shadow-none p-2 border-2 border-stroke-black rounded-lg neo-shadow-sm bg-surface">
+<span class="material-symbols-outlined" data-icon="hub">hub</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-black text-primary dark:text-primary-fixed-dim">InConnect</h1>
+<button class="text-primary dark:text-primary-fixed-dim hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all active:translate-x-[5px] active:translate-y-[5px] active:shadow-none p-2 border-2 border-stroke-black rounded-lg neo-shadow-sm bg-surface">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+</header>
+<!-- Mobile Header (Simplified) -->
+<header class="md:hidden flex justify-between items-center px-margin-page py-4 sticky top-0 bg-background z-40 border-b-stroke-weight border-stroke-black mb-6">
+<button class="p-2 border-2 border-stroke-black rounded-lg neo-shadow-sm bg-surface hover:bg-surface-variant transition-colors active:translate-y-[2px] active:translate-x-[2px] active:shadow-none">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm font-black text-on-surface">Profile</h1>
+<button class="p-2 border-2 border-stroke-black rounded-lg neo-shadow-sm bg-surface hover:bg-surface-variant transition-colors active:translate-y-[2px] active:translate-x-[2px] active:shadow-none">
+<span class="material-symbols-outlined" data-icon="qr_code_scanner">qr_code_scanner</span>
+</button>
+</header>
+<main class="max-w-4xl mx-auto px-margin-page py-8 space-y-12">
+<!-- Profile Header Section -->
+<section class="relative">
+<!-- Background Decoration -->
+<div class="absolute -top-4 -right-4 w-32 h-32 bg-secondary-container rounded-full border-4 border-stroke-black z-0 opacity-80 md:w-48 md:h-48 md:-right-8"></div>
+<div class="relative z-10 bg-surface rounded-xl neo-border neo-shadow p-6 md:p-8 flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8">
+<!-- Avatar -->
+<div class="relative shrink-0">
+<div class="w-32 h-32 md:w-40 md:h-40 rounded-full border-[4px] border-stroke-black overflow-hidden neo-shadow bg-surface-variant">
+<img alt="Profile Picture" class="w-full h-full object-cover" data-alt="A portrait photo of a young professional in a brightly lit studio with a vibrant yellow background. The style is bold, expressive, and slightly stylized to match a graphic neo-brutalist aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVzRiT3XnuTH98NumVTmceYrSKW9xt2L8tvGsUxe4m1ll_zwcLYmCrmVvk8nfizcGxxn9fAVHlYJC-LDx1iXjR1b2Hd00H7a2TP0MrTVg8p1iEcu4Y2Gxup93sO648L4Qebf8UJMj2FOnQmQkRY2WASGu-BCHDf3IeUJWXjv9YP6F6pYgxMjFS6DAvA5GPx7wcpErrFUjZfKM8x2s0OjrNzRnDo4kP30_Fo9QhklrZBt1oERMoJdk"/>
+</div>
+<div class="absolute -bottom-2 -right-2 bg-neon-lime border-[3px] border-stroke-black rounded-full p-2 neo-shadow-sm">
+<span class="material-symbols-outlined text-stroke-black" data-icon="verified">verified</span>
+</div>
+</div>
+<!-- Info -->
+<div class="flex-1 text-center md:text-left space-y-4 w-full">
+<div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-on-surface mb-1">Alex Rivera</h2>
+<p class="font-label-md text-on-surface-variant bg-surface-container inline-block px-3 py-1 rounded-md border-2 border-stroke-black">@arivera_design</p>
+</div>
+<p class="font-body-md text-on-surface max-w-lg mx-auto md:mx-0">
+                        Digital creator &amp; UI enthusiast. Exploring the intersection of brutalism and accessible design. Based in San Francisco. 🌉
+                    </p>
+<div class="flex flex-wrap justify-center md:justify-start gap-4 pt-2">
+<div class="flex items-center gap-1 font-label-md text-on-surface">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-bold">1.2k</span> Followers
+                        </div>
+<div class="flex items-center gap-1 font-label-md text-on-surface">
+<span class="material-symbols-outlined" data-icon="person_add">person_add</span>
+<span class="font-bold">450</span> Following
+                        </div>
+</div>
+<!-- Actions -->
+<div class="flex flex-col sm:flex-row gap-4 pt-4">
+<button class="bg-vivid-yellow text-stroke-black font-label-md px-6 py-3 rounded-lg neo-border neo-shadow transition-all neo-shadow-active hover:bg-[#ffeb85] flex-1 md:flex-none flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+                            Edit Profile
+                        </button>
+<button class="bg-surface text-stroke-black font-label-md px-6 py-3 rounded-lg neo-border neo-shadow transition-all neo-shadow-active hover:bg-surface-variant flex-1 md:flex-none flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+                            Share
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Details Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Interests Folder -->
+<div>
+<div class="folder-tab bg-tertiary-fixed-dim font-label-sm uppercase tracking-wider text-stroke-black">Interests</div>
+<div class="bg-surface p-6 rounded-xl rounded-tl-none neo-border neo-shadow">
+<div class="flex flex-wrap gap-3">
+<span class="bg-neon-lime text-stroke-black font-label-md px-4 py-2 rounded-md border-2 border-stroke-black neo-shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="palette">palette</span> Design
+                        </span>
+<span class="bg-primary-fixed-dim text-stroke-black font-label-md px-4 py-2 rounded-md border-2 border-stroke-black neo-shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="code">code</span> Coding
+                        </span>
+<span class="bg-secondary-container text-stroke-black font-label-md px-4 py-2 rounded-md border-2 border-stroke-black neo-shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="headphones">headphones</span> Lo-Fi
+                        </span>
+<span class="bg-surface-container text-stroke-black font-label-md px-4 py-2 rounded-md border-2 border-stroke-black neo-shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="coffee">coffee</span> Coffee
+                        </span>
+<span class="bg-vivid-yellow text-stroke-black font-label-md px-4 py-2 rounded-md border-2 border-stroke-black neo-shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="hiking">hiking</span> Outdoors
+                        </span>
+</div>
+</div>
+</div>
+<!-- Personality Folder -->
+<div>
+<div class="folder-tab bg-primary-fixed-dim font-label-sm uppercase tracking-wider text-stroke-black">Personality</div>
+<div class="bg-surface p-6 rounded-xl rounded-tl-none neo-border neo-shadow">
+<ul class="space-y-4">
+<li class="flex items-center gap-4 p-3 bg-surface-container rounded-lg border-2 border-stroke-black">
+<div class="w-10 h-10 bg-vivid-yellow rounded-md border-2 border-stroke-black flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+</div>
+<div>
+<h4 class="font-label-md">INTP-A</h4>
+<p class="text-xs font-body-md text-on-surface-variant">Logician</p>
+</div>
+</li>
+<li class="flex items-center gap-4 p-3 bg-surface-container rounded-lg border-2 border-stroke-black">
+<div class="w-10 h-10 bg-secondary-container rounded-md border-2 border-stroke-black flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined" data-icon="schedule">schedule</span>
+</div>
+<div>
+<h4 class="font-label-md">Night Owl</h4>
+<p class="text-xs font-body-md text-on-surface-variant">Most active after 10 PM</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 bg-surface-container-highest border-t-spacing-stroke-weight border-stroke-black dark:border-white z-50 md:hidden pb-safe"><a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow dark:hover:bg-secondary-container transition-colors active:scale-95 transition-transform rounded-xl" href="#"><span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 0;">home</span><span class="font-label-sm text-label-sm mt-1 hidden">home</span></a><a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow dark:hover:bg-secondary-container transition-colors active:scale-95 transition-transform rounded-xl" href="#"><span class="material-symbols-outlined" data-icon="explore" style="font-variation-settings: 'FILL' 0;">explore</span><span class="font-label-sm text-label-sm mt-1 hidden">explore</span></a><a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow dark:hover:bg-secondary-container transition-colors active:scale-95 transition-transform rounded-xl" href="#"><span class="material-symbols-outlined" data-icon="chat" style="font-variation-settings: 'FILL' 0;">chat</span><span class="font-label-sm text-label-sm mt-1 hidden">chat</span></a><a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow dark:hover:bg-secondary-container transition-colors active:scale-95 transition-transform rounded-xl" href="#"><span class="material-symbols-outlined" data-icon="groups" style="font-variation-settings: 'FILL' 0;">groups</span><span class="font-label-sm text-label-sm mt-1 hidden">groups</span></a><a class="flex flex-col items-center justify-center bg-neon-lime text-stroke-black border-2 border-stroke-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] p-2 rounded-xl active:scale-95 transition-transform" href="#"><span class="material-symbols-outlined" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span><span class="font-label-sm text-label-sm mt-1 hidden">person</span></a></nav>
+<style>
+        /* Safe area padding for bottom nav on modern mobile devices */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            .pb-safe {
+                padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+            }
+        }
+    </style>
+</body></html>

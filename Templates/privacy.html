@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Privacy Policy - InConnect{% endblock %}
+{% block body_classes %}bg-surface-off-white text-on-surface font-body-md antialiased pb-24 md:pb-0{% endblock %}
+{% block content %}
+<div class="page-enter min-h-screen flex flex-col">
+<header class="bg-surface-container w-full sticky top-0 border-b-[3px] border-stroke-black shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] flex justify-between items-center px-margin-page py-4 z-50">
+    <a href="javascript:history.back()" class="text-primary hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all p-2 border-2 border-stroke-black rounded-lg neo-shadow-sm bg-surface">
+        <span class="material-symbols-outlined">arrow_back</span>
+    </a>
+    <h1 class="font-headline-md text-headline-md font-black text-primary">InConnect</h1>
+    <span class="w-10"></span>
+</header>
+<main class="flex-1 max-w-3xl mx-auto px-margin-page py-8">
+    <div class="bg-surface border-[3px] border-stroke-black rounded-xl neo-shadow p-6 md:p-8">
+        <h1 class="font-headline-lg text-headline-lg text-stroke-black mb-2">Privacy Policy</h1>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-6">Last updated: 2026</p>
+
+        <div class="space-y-6 font-body-md text-body-md text-on-surface">
+            <section>
+                <h2 class="font-headline-sm text-headline-sm text-stroke-black mb-2">1. Information We Collect</h2>
+                <p>We collect the information you provide when creating an account, such as your username, profile details, and the content you share. We may also collect usage data to improve the service.</p>
+            </section>
+            <section>
+                <h2 class="font-headline-sm text-headline-sm text-stroke-black mb-2">2. How We Use Information</h2>
+                <p>We use your information to provide and personalize InConnect, connect you with other users, send notifications, and ensure the security of the platform.</p>
+            </section>
+            <section>
+                <h2 class="font-headline-sm text-headline-sm text-stroke-black mb-2">3. Sharing of Information</h2>
+                <p>Your profile information is visible to other users to enable connection and messaging. We do not sell your personal data to third parties.</p>
+            </section>
+            <section>
+                <h2 class="font-headline-sm text-headline-sm text-stroke-black mb-2">4. Data Security</h2>
+                <p>We take reasonable measures to protect your information from unauthorized access, alteration, or disclosure.</p>
+            </section>
+            <section>
+                <h2 class="font-headline-sm text-headline-sm text-stroke-black mb-2">5. Your Choices</h2>
+                <p>You can update your profile information and preferences at any time from your profile page, including your display and screen-size settings.</p>
+            </section>
+            <section>
+                <h2 class="font-headline-sm text-headline-sm text-stroke-black mb-2">6. Data Retention</h2>
+                <p>We retain your information for as long as your account is active or as needed to provide the service. You may delete your account at any time.</p>
+            </section>
+            <section>
+                <h2 class="font-headline-sm text-headline-sm text-stroke-black mb-2">7. Contact Us</h2>
+                <p>If you have questions about this Privacy Policy, please contact us through the InConnect platform.</p>
+            </section>
+        </div>
+    </div>
+</main>
+{% include '_footer.html' %}
+</div>
+{% endblock %}

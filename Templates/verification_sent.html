@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Verify your email - InConnect{% endblock %}
+{% block extra_head %}
+<style>
+    body { background-color: #eae6f4; background-image: radial-gradient(#1b1b24 1px, transparent 1px); background-size: 20px 20px; }
+</style>
+{% endblock %}
+{% block body_classes %}min-h-screen flex flex-col font-body-md text-on-surface p-margin-page md:p-12 items-center justify-center{% endblock %}
+{% block content %}
+<div class="page-enter">
+<main class="w-full max-w-md bg-surface-off-white border-[3px] border-stroke-black p-8 neo-shadow rounded-xl flex flex-col gap-6 relative text-center">
+    <div class="absolute -top-[15px] -left-[3px] bg-neon-lime border-[3px] border-stroke-black px-4 py-1 font-label-md text-label-md text-on-surface neo-shadow z-10 rounded-t-lg">
+        EMAIL SENT
+    </div>
+    <span class="material-symbols-outlined mx-auto mt-4 text-6xl bg-neon-lime border-[3px] border-stroke-black rounded-full p-4 neo-shadow" style="font-variation-settings: 'FILL' 1;">mark_email_read</span>
+    <div>
+        <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface uppercase tracking-tight">Check your inbox</h1>
+        <p class="font-body-md text-body-md text-on-surface-variant mt-2">A verification email has been sent to <strong class="text-on-surface">{{ request.user.email }}</strong>.</p>
+        <p class="font-body-md text-body-md text-on-surface-variant mt-2">Open the link in the email to verify and fully secure your account. If you don't see it, check your spam folder.</p>
+    </div>
+    <form method="post" action="{% url 'resend_verification' %}" class="w-full flex flex-col gap-3">
+        {% csrf_token %}
+        <button type="submit" class="w-full py-4 bg-vivid-yellow border-[3px] border-stroke-black font-headline-sm text-headline-sm uppercase text-center neo-shadow active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all flex items-center justify-center gap-2">
+            Resend Verification Email
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">refresh</span>
+        </button>
+    </form>
+    <a href="{% url 'matches' %}" class="font-label-md text-label-md text-primary underline hover:bg-neon-lime transition-colors">
+        Skip for now — go to your matches
+    </a>
+</main>
+<p class="mt-4 font-label-sm text-label-sm text-on-surface-variant text-center">© 2026 InConnect</p>
+</div>
+{% endblock %}

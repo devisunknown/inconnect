@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Terms of Service - InConnect{% endblock %}
+{% block body_classes %}bg-surface-off-white text-on-surface font-body-md antialiased pb-24 md:pb-0{% endblock %}
+{% block content %}
+<div class="page-enter min-h-screen flex flex-col">
+<header class="bg-surface-container w-full sticky top-0 border-b-[3px] border-stroke-black shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] flex justify-between items-center px-margin-page py-4 z-50">
+    <a href="javascript:history.back()" class="text-primary hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all p-2 border-2 border-stroke-black rounded-lg neo-shadow-sm bg-surface">
+        <span class="material-symbols-outlined">arrow_back</span>
+    </a>
+    <h1 class="font-headline-md text-headline-md font-black text-primary">InConnect</h1>
+    <span class="w-10"></span>
+</header>
+<main class="flex-1 max-w-3xl mx-auto px-margin-page py-8">
+    <div class="bg-surface border-[3px] border-stroke-black rounded-xl neo-shadow p-6 md:p-8">
+        <h1 class="font-headline-lg text-headline-lg text-stroke-black mb-2">Terms of Service</h1>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-6">Last updated: 2026</p>
+
+        <div class="space-y-6 font-body-md text-body-md text-on-surface">
+            <section>
+                <h2 class="font-headline-sm text-headline-sm text-stroke-black mb-2">1. Acceptance of Terms</h2>
+                <p>By creating an account or using InConnect, you agree to these Terms of Service. If you do not agree, please do not use the service.</p>
+            </section>
+            <section>
+                <h2 class="font-headline-sm text-headline-sm text-stroke-black mb-2">2. Eligibility</h2>
+                <p>You must be at least 13 years old to use InConnect. By using the service, you confirm that you meet this requirement and that the information you provide is accurate.</p>
+            </section>
+            <section>
+                <h2 class="font-headline-sm text-headline-sm text-stroke-black mb-2">3. Your Account</h2>
+                <p>You are responsible for maintaining the confidentiality of your account credentials and for all activity under your account. Notify us immediately of any unauthorized use.</p>
+            </section>
+            <section>
+                <h2 class="font-headline-sm text-headline-sm text-stroke-black mb-2">4. User Conduct</h2>
+                <p>You agree not to misuse the service, attempt to disrupt it, harass other users, or share unlawful content. We may suspend accounts that violate these rules.</p>
+            </section>
+            <section>
+                <h2 class="font-headline-sm text-headline-sm text-stroke-black mb-2">5. Content</h2>
+                <p>You retain ownership of content you share. By posting, you grant InConnect a limited license to display that content to provide the service.</p>
+            </section>
+            <section>
+                <h2 class="font-headline-sm text-headline-sm text-stroke-black mb-2">6. Termination</h2>
+                <p>We may suspend or terminate your access for violations of these terms. You may stop using the service at any time.</p>
+            </section>
+            <section>
+                <h2 class="font-headline-sm text-headline-sm text-stroke-black mb-2">7. Limitation of Liability</h2>
+                <p>InConnect is provided "as is" without warranties. To the fullest extent permitted by law, we are not liable for indirect or consequential damages.</p>
+            </section>
+            <section>
+                <h2 class="font-headline-sm text-headline-sm text-stroke-black mb-2">8. Changes to These Terms</h2>
+                <p>We may update these terms from time to time. Continued use of the service after changes constitutes acceptance of the revised terms.</p>
+            </section>
+        </div>
+    </div>
+</main>
+{% include '_footer.html' %}
+</div>
+{% endblock %}

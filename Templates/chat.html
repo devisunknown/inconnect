@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+{% block title %}Chat - InConnect{% endblock %}
+{% block extra_head %}
+<style>
+    .neo-shadow { box-shadow: 5px 5px 0px 0px rgba(0,0,0,1); }
+    .neo-shadow-sm { box-shadow: 3px 3px 0px 0px rgba(0,0,0,1); }
+    .chat-bubble { max-width: 75%; }
+    .outgoing { background-color: #4d44e3; color: #ffffff; border: 3px solid #000000; }
+    .incoming { background-color: #f4f4f5; color: #1b1b24; border: 3px solid #000000; }
+    .status-dot { background-color: #3b82f6; }
+    .outgoing[data-read="1"] .status-dot { background-color: #22c55e; }
+    @keyframes bounce-dot {
+        0%, 60%, 100% { transform: translateY(0); }
+        30% { transform: translateY(-6px); }
+    }
+    .typing-dot { animation: bounce-dot 1.2s ease-in-out infinite; }
+    .typing-dot:nth-child(2) { animation-delay: 0.15s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes emoji-pop {
+        0% { transform: scale(0); opacity: 0; }
+        60% { transform: scale(1.2); }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    .emoji-pop { animation: emoji-pop 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes pulse-green {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+        50% { box-shadow: 0 0 0 4px rgba(34, 197, 94, 0); }
+    }
+    .online-pulse { animation: pulse-green 2s ease-in-out infinite; }
+</style>
+{% endblock %}
+{% block body_classes %}chat-page bg-surface-off-white text-on-surface font-body-md flex flex-col{% endblock %}
+{% block content %}
+<div class="flex flex-col h-full">
+<header class="bg-surface-container w-full top-0 sticky z-50 border-b-[3px] border-stroke-black shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] shrink-0">
+    <div class="flex justify-between items-center px-margin-page py-4 w-full z-50">
+        <a href="{% url 'messages' %}" class="flex items-center justify-center p-2 border-[3px] border-stroke-black bg-surface rounded-xl hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
+            <span class="material-symbols-outlined text-primary">arrow_back</span>
+        </a>
+        <div class="flex items-center gap-3">
+            <div class="relative">
+                {% if other.profile.avatar %}
+                <div class="w-10 h-10 rounded-full border-[3px] border-stroke-black overflow-hidden"><img class="w-full h-full object-cover" src="{{ other.profile.avatar.url }}" alt=""/></div>
+                {% else %}
+                <div class="w-10 h-10 rounded-full border-[3px] border-stroke-black bg-secondary-container flex items-center justify-center"><span class="material-symbols-outlined text-lg">person</span></div>
+                {% endif %}
+                <div id="online-dot" class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-outline border-2 border-stroke-black rounded-full"></div>
+            </div>
+            <div>
+                <h1 class="font-headline-sm text-headline-sm">{{ other.profile.full_name }}</h1>
+                <div class="flex items-center gap-1.5">
+                    <span id="presence-emoji" class="text-sm hidden emoji-pop"></span>
+                    <p id="status-text" class="font-label-sm text-label-sm text-on-surface-variant">offline</p>
+                </div>
+            </div>
+        </div>
+        <button class="flex items-center justify-center p-2 border-[3px] border-stroke-black bg-surface rounded-xl hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
+            <span class="material-symbols-outlined text-primary">more_horiz</span>
+        </button>
+    </div>
+</header>
+
+<main id="chat-messages" class="flex-1 px-margin-page py-6 max-w-3xl mx-auto w-full flex flex-col gap-3 overflow-y-auto">
+    {% for msg in messages %}
+    {% if msg.sender == request.user %}
+    <div class="chat-bubble outgoing self-end rounded-xl px-4 py-3 neo-shadow-sm{% if not msg.is_read %} unread{% endif %}" data-read="{% if msg.is_read %}1{% else %}0{% endif %}">
+        <p class="font-body-md">{{ msg.content }}</p>
+        <p class="text-right text-xs mt-1 font-label-sm inline-flex items-center justify-end gap-1.5" style="color:#e2dfff">
+            <span class="status-dot inline-block w-2.5 h-2.5 rounded-full border border-stroke-black"></span>{{ msg.created_at|date:"g:i A" }}
+        </p>
+    </div>
+    {% else %}
+    <div class="chat-bubble incoming self-start rounded-xl px-4 py-3 neo-shadow-sm">
+        <p class="font-body-md">{{ msg.content }}</p>
+        <p class="text-xs mt-1 font-label-sm text-on-surface-variant">{{ msg.created_at|date:"g:i A" }}</p>
+    </div>
+    {% endif %}
+    {% endfor %}
+    <div id="typing-indicator" class="hidden self-start chat-bubble incoming rounded-xl px-4 py-3 neo-shadow-sm">
+        <div class="flex items-center gap-1.5 h-5">
+            <span class="typing-dot inline-block w-2 h-2 bg-on-surface-variant rounded-full"></span>
+            <span class="typing-dot inline-block w-2 h-2 bg-on-surface-variant rounded-full"></span>
+            <span class="typing-dot inline-block w-2 h-2 bg-on-surface-variant rounded-full"></span>
+        </div>
+    </div>
+</main>
+
+<footer id="chat-footer" class="border-t-[3px] border-stroke-black bg-surface-container p-margin-page shrink-0" style="padding-bottom: calc(2rem + env(safe-area-inset-bottom));">
+    <form id="message-form" class="flex gap-3 max-w-3xl mx-auto w-full items-center">
+        {% csrf_token %}
+        <input id="message-input" class="flex-1 min-w-0 pl-4 pr-4 py-4 bg-surface border-[3px] border-stroke-black rounded-xl neo-shadow-sm focus:outline-none font-label-md placeholder:text-outline text-base leading-snug" placeholder="Type a message..." autocomplete="off" required/>
+        <button type="submit" class="bg-vivid-yellow border-[3px] border-stroke-black rounded-xl px-5 py-4 neo-shadow hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined font-bold" style="font-variation-settings: 'FILL' 1;">send</span>
+        </button>
+    </form>
+    <div class="max-w-3xl mx-auto w-full mt-2 flex items-center justify-center gap-4 font-label-sm text-label-sm text-on-surface-variant">
+        <span>© 2026 InConnect</span>
+        <a href="{% url 'terms' %}" class="hover:underline text-primary">Terms</a>
+        <a href="{% url 'privacy' %}" class="hover:underline text-primary">Privacy</a>
+    </div>
+</footer>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const chatId = {{ chat.id }};
+const currentUsername = "{{ request.user.username|escapejs }}";
+const otherUsername = "{{ other.username|escapejs }}";
+const wsProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+const socket = new WebSocket(wsProtocol + window.location.host + '/ws/chat/' + chatId + '/');
+
+const onlineDot = document.getElementById('online-dot');
+const statusText = document.getElementById('status-text');
+const presenceEmoji = document.getElementById('presence-emoji');
+const typingIndicator = document.getElementById('typing-indicator');
+let typingTimeout = null;
+let otherUserEmoji = '';
+
+function setOnline() {
+    onlineDot.className = 'absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-neon-lime border-2 border-stroke-black rounded-full online-pulse';
+    statusText.textContent = 'online';
+    statusText.className = 'font-label-sm text-label-sm text-neon-lime';
+}
+
+function setOffline() {
+    onlineDot.className = 'absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-outline border-2 border-stroke-black rounded-full';
+    statusText.textContent = 'offline';
+    statusText.className = 'font-label-sm text-label-sm text-on-surface-variant';
+    presenceEmoji.classList.add('hidden');
+    presenceEmoji.classList.remove('emoji-pop');
+}
+
+socket.onopen = function() {
+    console.log('WebSocket connected');
+};
+
+socket.onclose = function() {
+    setOffline();
+    statusText.textContent = 'reconnecting...';
+    statusText.className = 'font-label-sm text-label-sm text-error';
+    setTimeout(function() {
+        location.reload();
+    }, 3000);
+};
+
+socket.onerror = function(e) {
+    console.error('WebSocket error', e);
+};
+
+socket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+
+    if (data.type === 'connected') {
+        setOnline();
+    } else if (data.type === 'message') {
+        appendMessage(data.message, data.sender === currentUsername, !!data.read);
+        hideTyping();
+    } else if (data.type === 'user_joined') {
+        otherUserEmoji = data.emoji;
+        showPresence(data.emoji);
+        setOnline();
+    } else if (data.type === 'user_left') {
+        setOffline();
+    } else if (data.type === 'typing_start') {
+        showTyping();
+    } else if (data.type === 'typing_stop') {
+        hideTyping();
+    }
+};
+
+function showPresence(emoji) {
+    presenceEmoji.textContent = emoji;
+    presenceEmoji.classList.remove('hidden');
+    presenceEmoji.classList.remove('emoji-pop');
+    void presenceEmoji.offsetWidth;
+    presenceEmoji.classList.add('emoji-pop');
+}
+
+function showTyping() {
+    var box = document.getElementById('chat-messages');
+    box.appendChild(typingIndicator);
+    typingIndicator.classList.remove('hidden');
+    box.scrollTop = box.scrollHeight;
+}
+
+function hideTyping() {
+    typingIndicator.classList.add('hidden');
+}
+
+function sendTypingStart() {
+    if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ type: 'typing_start' }));
+    }
+}
+
+function sendTypingStop() {
+    if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ type: 'typing_stop' }));
+    }
+}
+
+function appendMessage(content, isMine, read) {
+    const box = document.getElementById('chat-messages');
+    const div = document.createElement('div');
+    const time = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    if (isMine) {
+        div.className = 'chat-bubble outgoing self-end rounded-xl px-4 py-3 neo-shadow-sm';
+        div.setAttribute('data-read', read ? '1' : '0');
+        div.innerHTML = '<p class="font-body-md"></p><p class="text-right text-xs mt-1 font-label-sm inline-flex items-center justify-end gap-1.5" style="color:#e2dfff"><span class="status-dot inline-block w-2.5 h-2.5 rounded-full border border-stroke-black"></span>' + time + '</p>';
+    } else {
+        div.className = 'chat-bubble incoming self-start rounded-xl px-4 py-3 neo-shadow-sm';
+        div.innerHTML = '<p class="font-body-md"></p><p class="text-xs mt-1 font-label-sm text-on-surface-variant">' + time + '</p>';
+    }
+    div.querySelector('p').textContent = content;
+    box.appendChild(div);
+    box.appendChild(typingIndicator);
+    box.scrollTop = box.scrollHeight;
+}
+
+document.getElementById('message-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const input = document.getElementById('message-input');
+    const message = input.value.trim();
+    if (!message) return;
+    sendTypingStop();
+    if (typingTimeout) { clearTimeout(typingTimeout); typingTimeout = null; }
+    if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ type: 'message', message: message }));
+        input.value = '';
+    } else {
+        sendFallback(message);
+        input.value = '';
+    }
+});
+
+document.getElementById('message-input').addEventListener('input', function() {
+    sendTypingStart();
+    if (typingTimeout) clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(function() {
+        sendTypingStop();
+        typingTimeout = null;
+    }, 4000);
+});
+
+function sendFallback(message) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = window.location.pathname;
+    const csrf = document.createElement('input');
+    csrf.type = 'hidden';
+    csrf.name = 'csrfmiddlewaretoken';
+    csrf.value = document.querySelector('[name=csrfmiddlewaretoken]') ? document.querySelector('[name=csrfmiddlewaretoken]').value : '{{ csrf_token }}';
+    const msgInput = document.createElement('input');
+    msgInput.type = 'hidden';
+    msgInput.name = 'message';
+    msgInput.value = message;
+    form.appendChild(csrf);
+    form.appendChild(msgInput);
+    document.body.appendChild(form);
+    form.submit();
+}
+
+var box = document.getElementById('chat-messages');
+box.scrollTop = box.scrollHeight;
+
+const chatBox = box;
+const messageInput = document.getElementById('message-input');
+
+function onViewportResize() {
+    document.documentElement.style.height = window.innerHeight + 'px';
+    chatBox.scrollTop = chatBox.scrollHeight;
+    if (document.activeElement === messageInput) {
+        messageInput.scrollIntoView({ block: 'nearest' });
+    }
+}
+
+if (window.visualViewport) {
+    const vv = window.visualViewport;
+    vv.addEventListener('resize', function() {
+        requestAnimationFrame(onViewportResize);
+    });
+    vv.addEventListener('scroll', onViewportResize);
+    window.addEventListener('resize', onViewportResize);
+}
+
+messageInput.addEventListener('focus', function() {
+    setTimeout(function() { chatBox.scrollTop = chatBox.scrollHeight; }, 250);
+    setTimeout(function() { chatBox.scrollTop = chatBox.scrollHeight; }, 700);
+});
+</script>
+{% endblock %}

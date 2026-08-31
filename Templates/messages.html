@@ -1,0 +1,354 @@
+{% extends 'base.html' %}
+{% block title %}Messages - InConnect{% endblock %}
+{% block extra_head %}
+<style>
+    .neo-brutalism-shadow { box-shadow: 5px 5px 0px 0px #000000; }
+    .neo-brutalism-interaction:active { box-shadow: 0px 0px 0px 0px #000000; transform: translate(5px, 5px); }
+    @keyframes unread-pulse {
+        0% { box-shadow: 0 0 0 0 rgba(186, 26, 26, 0.6); }
+        70% { box-shadow: 0 0 0 6px rgba(186, 26, 26, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(186, 26, 26, 0); }
+    }
+    @keyframes sheet-up {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+    }
+    @keyframes backdrop-fade {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    .sheet-enter { animation: sheet-up 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .backdrop-enter { animation: backdrop-fade 0.2s ease forwards; }
+</style>
+{% endblock %}
+{% block body_classes %}bg-surface-off-white text-on-surface font-body-md min-h-screen flex flex-col pb-[80px]{% endblock %}
+{% block content %}
+<div class="page-enter">
+<header class="bg-surface-container w-full top-0 sticky z-50 border-b-[3px] border-stroke-black shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]">
+    <div class="flex justify-between items-center px-margin-page py-4 w-full z-50">
+        <a href="{% url 'matches' %}" class="flex items-center justify-center p-2 border-[3px] border-stroke-black bg-surface rounded-xl hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
+            <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">hub</span>
+        </a>
+        <h1 class="font-headline-md text-headline-md font-black text-primary">InConnect</h1>
+        <button id="header-search-btn" class="flex items-center justify-center p-2 border-[3px] border-stroke-black bg-surface rounded-xl hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
+            <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">search</span>
+        </button>
+    </div>
+</header>
+<main class="flex-grow px-margin-page py-6 max-w-3xl mx-auto w-full flex flex-col gap-gutter-md">
+    <div class="reveal flex flex-col gap-4">
+        <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface tracking-tighter">Messages. <br/> <span class="text-primary">Stay connected.</span></h2>
+        <div class="relative flex w-full">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <span class="material-symbols-outlined text-stroke-black">search</span>
+            </div>
+            <input id="search-input" class="w-full pl-12 pr-4 py-4 bg-surface border-[3px] border-stroke-black rounded-xl neo-brutalism-shadow focus:outline-none focus:ring-0 font-label-md text-label-md text-stroke-black placeholder:text-outline transition-all" placeholder="Search conversations" type="text"/>
+            <button class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                <span class="material-symbols-outlined text-stroke-black">keyboard_return</span>
+            </button>
+        </div>
+    </div>
+    <div class="reveal flex gap-4 overflow-x-auto pb-2">
+        <button data-filter="all" class="filter-chip relative flex-shrink-0 bg-vivid-yellow border-[3px] border-stroke-black px-4 py-2 rounded-xl font-label-sm text-label-sm text-stroke-black neo-brutalism-shadow flex items-center gap-1.5">
+            <span>All</span>
+            {% if total_chats %}
+            <span class="badge-count flex items-center justify-center min-w-5 h-5 px-1.5 bg-stroke-black text-surface-off-white border-[2px] border-stroke-black rounded-full font-label-sm text-label-sm" style="font-size:11px;line-height:12px;">{{ total_chats }}</span>
+            {% endif %}
+        </button>
+        <button data-filter="unread" class="filter-chip relative flex-shrink-0 bg-surface border-[3px] border-stroke-black px-4 py-2 rounded-xl font-label-sm text-label-sm text-stroke-black hover:bg-secondary-fixed transition-colors flex items-center gap-1.5">
+            <span>Unread</span>
+            {% if total_unread %}
+            <span class="badge-count relative flex items-center justify-center min-w-5 h-5 px-1.5 bg-error text-white border-[2px] border-stroke-black rounded-full font-label-sm text-label-sm" style="font-size:11px;line-height:12px;">{{ total_unread }}</span>
+            <span class="unread-dot absolute -top-1 -right-1 w-3 h-3 bg-error border-2 border-stroke-black rounded-full" style="animation:unread-pulse 1.6s infinite;"></span>
+            {% else %}
+            <span class="unread-dot absolute -top-1 -right-1 w-3 h-3 bg-outline border-2 border-stroke-black rounded-full"></span>
+            {% endif %}
+        </button>
+        <button data-filter="groups" class="filter-chip relative flex-shrink-0 bg-surface border-[3px] border-stroke-black px-4 py-2 rounded-xl font-label-sm text-label-sm text-stroke-black hover:bg-primary-fixed transition-colors flex items-center gap-1.5">
+            <span>Groups</span>
+            {% if group_chat_count %}
+            <span class="badge-count flex items-center justify-center min-w-5 h-5 px-1.5 bg-stroke-black text-surface-off-white border-[2px] border-stroke-black rounded-full font-label-sm text-label-sm" style="font-size:11px;line-height:12px;">{{ group_chat_count }}</span>
+            {% endif %}
+        </button>
+        <button data-filter="archived" class="filter-chip relative flex-shrink-0 bg-surface border-[3px] border-stroke-black px-4 py-2 rounded-xl font-label-sm text-label-sm text-stroke-black hover:bg-tertiary-fixed transition-colors flex items-center gap-1.5">
+            <span>Archived</span>
+            {% if archived_chats %}
+            <span class="badge-count flex items-center justify-center min-w-5 h-5 px-1.5 bg-stroke-black text-surface-off-white border-[2px] border-stroke-black rounded-full font-label-sm text-label-sm" style="font-size:11px;line-height:12px;">{{ archived_chats|length }}</span>
+            {% endif %}
+        </button>
+    </div>
+    <div id="chat-list" class="flex flex-col gap-6 mt-4">
+        {% for chat in chats %}
+        <div class="chat-item reveal group relative flex items-center gap-4 p-4 bg-surface border-[3px] border-stroke-black rounded-xl neo-brutalism-shadow neo-brutalism-interaction transition-all cursor-pointer" data-unread="{% if chat.unread_count %}1{% else %}0{% endif %}" {% if chat.is_group %}data-group="1"{% endif %}>
+            <a href="{% url 'chat_room' chat.id %}" class="absolute inset-0 z-[15]" aria-label="Open chat"></a>
+            <div class="absolute -top-3 -left-1 w-12 h-6 bg-neon-lime border-[3px] border-stroke-black rounded-t-lg z-0 border-b-0 pointer-events-none"></div>
+            <div class="relative flex-shrink-0 z-0 pointer-events-none">
+                <div class="w-14 h-14 rounded-full border-[3px] border-stroke-black overflow-hidden bg-surface-container">
+                    {% if chat.other.profile.avatar %}
+                    <img class="w-full h-full object-cover" src="{{ chat.other.profile.avatar.url }}" alt=""/>
+                    {% else %}
+                    <div class="w-full h-full bg-secondary-container flex items-center justify-center">
+                        <span class="material-symbols-outlined text-2xl">person</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% if chat.unread_count %}
+                <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-error border-2 border-stroke-black rounded-full flex items-center justify-center z-20">
+                    <span class="text-white font-label-sm text-label-sm" style="font-size:10px;line-height:10px;">{{ chat.unread_count }}</span>
+                </div>
+                {% elif chat.is_muted %}
+                <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-outline border-2 border-stroke-black rounded-full flex items-center justify-center z-20">
+                    <span class="material-symbols-outlined text-white" style="font-size:12px;">notifications_off</span>
+                </div>
+                {% else %}
+                <div class="absolute bottom-0 right-0 w-4 h-4 bg-neon-lime border-2 border-stroke-black rounded-full z-20"></div>
+                {% endif %}
+            </div>
+            <div class="flex-grow min-w-0 relative z-0 pointer-events-none">
+                <div class="flex justify-between items-baseline mb-1">
+                    <h3 class="font-headline-sm text-headline-sm truncate">{{ chat.other.profile.full_name }}</h3>
+                    <span class="font-label-sm text-label-sm text-on-surface-variant flex-shrink-0 ml-2">{{ chat.last_message.created_at|date:"g:i A" }}</span>
+                </div>
+                <div class="flex items-center gap-2 min-w-0">
+                    {% if chat.is_muted and not chat.unread_count %}
+                    <span class="material-symbols-outlined text-on-surface-variant flex-shrink-0" style="font-size:16px;">notifications_off</span>
+                    {% endif %}
+                    {% if chat.last_message %}
+                    <p class="font-body-md text-body-md {% if chat.unread_count %}text-on-surface font-bold{% else %}text-on-surface-variant{% endif %} truncate">{{ chat.last_message.content }}</p>
+                    {% else %}
+                    <p class="font-body-md text-body-md text-on-surface-variant truncate">Say hello 👋</p>
+                    {% endif %}
+                </div>
+            </div>
+            <button class="chat-menu-btn relative z-20 flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg border-[3px] border-stroke-black bg-surface hover:bg-surface-container transition-all" data-chat-id="{{ chat.id }}" data-chat-name="{{ chat.other.profile.full_name }}" data-unread="{% if chat.unread_count %}1{% else %}0{% endif %}" data-muted="{% if chat.is_muted %}1{% else %}0{% endif %}" aria-label="Chat options">
+                <span class="material-symbols-outlined text-stroke-black">more_vert</span>
+            </button>
+        </div>
+        {% empty %}
+        <div class="reveal bg-surface border-[3px] border-stroke-black rounded-xl neo-brutalism-shadow p-8 text-center">
+            <span class="material-symbols-outlined text-5xl text-primary" style="font-variation-settings: 'FILL' 1;">chat</span>
+            <h3 class="font-headline-sm text-headline-sm mt-3 mb-1">No conversations yet</h3>
+            <p class="font-body-md text-on-surface-variant mb-4">Discover people who share your interests and start chatting.</p>
+            <a href="{% url 'matches' %}" class="inline-block bg-vivid-yellow border-[3px] border-stroke-black px-6 py-3 font-label-md neo-brutalism-shadow">Find Matches</a>
+        </div>
+        {% endfor %}
+    </div>
+    <div id="empty-filter-state" class="hidden">
+        <div class="reveal bg-surface border-[3px] border-stroke-black rounded-xl neo-brutalism-shadow p-8 text-center">
+            <span id="empty-filter-icon" class="material-symbols-outlined text-5xl text-outline"></span>
+            <h3 id="empty-filter-title" class="font-headline-sm text-headline-sm mt-3 mb-1"></h3>
+            <p id="empty-filter-sub" class="font-body-md text-on-surface-variant mb-4"></p>
+        </div>
+    </div>
+    <div id="archived-list" class="hidden flex flex-col gap-6 mt-4">
+        {% for chat in archived_chats %}
+        <div class="chat-item archive-item reveal group relative flex items-center gap-4 p-4 bg-surface border-[3px] border-stroke-black rounded-xl neo-brutalism-shadow neo-brutalism-interaction transition-all cursor-pointer" data-unread="{% if chat.unread_count %}1{% else %}0{% endif %}">
+            <a href="{% url 'chat_room' chat.id %}" class="absolute inset-0 z-[15]" aria-label="Open chat"></a>
+            <div class="absolute -top-3 -left-1 w-12 h-6 bg-tertiary-fixed-dim border-[3px] border-stroke-black rounded-t-lg z-0 border-b-0 pointer-events-none"></div>
+            <div class="relative flex-shrink-0 z-0 pointer-events-none">
+                <div class="w-14 h-14 rounded-full border-[3px] border-stroke-black overflow-hidden bg-surface-container">
+                    {% if chat.other.profile.avatar %}
+                    <img class="w-full h-full object-cover" src="{{ chat.other.profile.avatar.url }}" alt=""/>
+                    {% else %}
+                    <div class="w-full h-full bg-secondary-container flex items-center justify-center">
+                        <span class="material-symbols-outlined text-2xl">person</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="absolute bottom-0 right-0 w-4 h-4 bg-tertiary-fixed-dim border-2 border-stroke-black rounded-full z-20"></div>
+            </div>
+            <div class="flex-grow min-w-0 relative z-0 pointer-events-none">
+                <div class="flex justify-between items-baseline mb-1">
+                    <h3 class="font-headline-sm text-headline-sm truncate">{{ chat.other.profile.full_name }}</h3>
+                    <span class="font-label-sm text-label-sm text-on-surface-variant flex-shrink-0 ml-2">{{ chat.last_message.created_at|date:"g:i A" }}</span>
+                </div>
+                <p class="font-body-md text-body-md text-on-surface-variant truncate">{% if chat.last_message %}{{ chat.last_message.content }}{% else %}Say hello 👋{% endif %}</p>
+            </div>
+            <button class="chat-menu-btn relative z-20 flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg border-[3px] border-stroke-black bg-surface hover:bg-surface-container transition-all" data-chat-id="{{ chat.id }}" data-chat-name="{{ chat.other.profile.full_name }}" data-unread="{% if chat.unread_count %}1{% else %}0{% endif %}" data-muted="{% if chat.is_muted %}1{% else %}0{% endif %}" data-archived="1" aria-label="Chat options">
+                <span class="material-symbols-outlined text-stroke-black">more_vert</span>
+            </button>
+        </div>
+        {% empty %}
+        <div class="reveal bg-surface border-[3px] border-stroke-black rounded-xl neo-brutalism-shadow p-8 text-center">
+            <span class="material-symbols-outlined text-5xl text-outline">inbox</span>
+            <h3 class="font-headline-sm text-headline-sm mt-3 mb-1">No archived chats</h3>
+            <p class="font-body-md text-on-surface-variant mb-4">Archived conversations appear here.</p>
+        </div>
+        {% endfor %}
+    </div>
+</main>
+</div>
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 bg-surface-container-highest border-t-[3px] border-stroke-black z-50 md:hidden">
+    <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors" href="{% url 'matches' %}"><span class="material-symbols-outlined text-primary">home</span></a>
+    <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors" href="{% url 'matches' %}"><span class="material-symbols-outlined text-primary">explore</span></a>
+    <a class="flex flex-col items-center justify-center bg-neon-lime text-stroke-black border-2 border-stroke-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] p-2 rounded-xl" href="{% url 'messages' %}"><span class="material-symbols-outlined text-stroke-black" style="font-variation-settings: 'FILL' 1;">chat</span></a>
+    <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors" href="{% url 'notifications' %}"><span class="material-symbols-outlined text-primary">notifications</span></a>
+    <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors" href="{% url 'profile' %}"><span class="material-symbols-outlined text-primary">person</span></a>
+</nav>
+{% include '_footer.html' %}
+
+<!-- WhatsApp-style bottom sheet -->
+<div id="sheet-backdrop" class="fixed inset-0 bg-black/40 z-[60] hidden backdrop-enter" onclick="closeSheet()"></div>
+<div id="action-sheet" class="fixed bottom-0 left-0 right-0 z-[70] translate-y-full transition-transform duration-300" style="transition-timing-function: cubic-bezier(0.16,1,0.3,1);">
+    <div class="bg-surface border-t-[3px] border-stroke-black rounded-t-3xl p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] max-w-3xl mx-auto w-full shadow-[0_-5px_0_0_rgba(0,0,0,1)]">
+        <div class="w-12 h-1.5 bg-outline-variant rounded-full mx-auto mb-4"></div>
+        <div id="sheet-chat-name" class="font-headline-sm text-headline-sm text-on-surface mb-2 truncate text-center"></div>
+        <div class="divide-y-[3px] divide-stroke-black border-[3px] border-stroke-black rounded-xl overflow-hidden bg-surface">
+            <button id="sheet-unread" class="sheet-action w-full flex items-center gap-4 px-5 py-4 bg-surface hover:bg-surface-container transition-colors" onclick="doAction('mark_unread')">
+                <span class="material-symbols-outlined text-primary">mark_email_unread</span>
+                <span class="font-label-md text-label-md text-stroke-black">Mark as Unread</span>
+            </button>
+            <button id="sheet-mute" class="sheet-action w-full flex items-center gap-4 px-5 py-4 bg-surface hover:bg-surface-container transition-colors" onclick="doAction('mute')">
+                <span class="material-symbols-outlined text-primary">notifications_off</span>
+                <span class="font-label-md text-label-md text-stroke-black mute-label">Mute</span>
+            </button>
+            <button id="sheet-archive" class="sheet-action w-full flex items-center gap-4 px-5 py-4 bg-surface hover:bg-surface-container transition-colors" onclick="doAction('archive')">
+                <span class="material-symbols-outlined text-primary">archive</span>
+                <span class="font-label-md text-label-md text-stroke-black archive-label">Archive</span>
+            </button>
+            <button id="sheet-delete" class="sheet-action w-full flex items-center gap-4 px-5 py-4 bg-surface hover:bg-error-container transition-colors" onclick="confirmDelete()">
+                <span class="material-symbols-outlined text-error">delete</span>
+                <span class="font-label-md text-label-md text-error" id="delete-label">Delete</span>
+            </button>
+        </div>
+        <button class="w-full mt-3 py-3 bg-surface-container border-[3px] border-stroke-black rounded-xl font-label-md text-label-md text-stroke-black hover:bg-surface-container-high transition-colors" onclick="closeSheet()">Close</button>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    const chatItems = document.querySelectorAll('.chat-item');
+    let activeFilter = 'all';
+
+    function applyFilters() {
+        const query = document.getElementById('search-input').value.toLowerCase();
+        const showArchived = activeFilter === 'archived';
+        const list = document.getElementById('chat-list');
+        const archList = document.getElementById('archived-list');
+        const emptyState = document.getElementById('empty-filter-state');
+        list.classList.toggle('hidden', showArchived);
+        archList.classList.toggle('hidden', !showArchived);
+        const items = showArchived ? archList.querySelectorAll('.chat-item') : list.querySelectorAll('.chat-item');
+        let visibleCount = 0;
+        items.forEach(function(item) {
+            const name = item.querySelector('.font-headline-sm').textContent.toLowerCase();
+            const body = item.querySelector('p') ? item.querySelector('p').textContent.toLowerCase() : '';
+            const matchesSearch = !query || name.indexOf(query) > -1 || body.indexOf(query) > -1;
+            const isUnread = item.dataset.unread === '1';
+            const isGroup = !!item.dataset.group;
+
+            let matchesFilter = true;
+            if (activeFilter === 'unread') matchesFilter = isUnread;
+            else if (activeFilter === 'groups') matchesFilter = isGroup;
+
+            const show = showArchived ? matchesSearch : (matchesSearch && matchesFilter);
+            item.style.display = show ? '' : 'none';
+            if (show) visibleCount++;
+        });
+
+        if (activeFilter === 'unread' && visibleCount === 0) {
+            emptyState.classList.remove('hidden');
+            document.getElementById('empty-filter-icon').textContent = 'mark_email_unread';
+            document.getElementById('empty-filter-title').textContent = 'No unread conversations';
+            document.getElementById('empty-filter-sub').textContent = 'You\'re all caught up. New messages will show here.';
+        } else if (activeFilter === 'groups' && visibleCount === 0) {
+            emptyState.classList.remove('hidden');
+            document.getElementById('empty-filter-icon').textContent = 'groups';
+            document.getElementById('empty-filter-title').textContent = 'No group chats yet';
+            document.getElementById('empty-filter-sub').textContent = 'Start or join a group to see it here.';
+        } else {
+            emptyState.classList.add('hidden');
+        }
+    }
+
+    document.getElementById('search-input').addEventListener('input', applyFilters);
+
+    document.getElementById('header-search-btn').addEventListener('click', function() {
+        document.getElementById('search-input').focus();
+        document.getElementById('search-input').scrollIntoView({behavior: 'smooth', block: 'center'});
+        document.getElementById('search-input').classList.add('bg-vivid-yellow');
+        setTimeout(function() {
+            document.getElementById('search-input').classList.remove('bg-vivid-yellow');
+        }, 500);
+    });
+
+    document.querySelectorAll('.filter-chip').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-chip').forEach(function(b) {
+                b.classList.remove('bg-vivid-yellow', 'neo-brutalism-shadow');
+                b.classList.add('bg-surface');
+            });
+            btn.classList.add('bg-vivid-yellow', 'neo-brutalism-shadow');
+            btn.classList.remove('bg-surface');
+            activeFilter = btn.dataset.filter;
+            applyFilters();
+        });
+    });
+
+    // ---- WhatsApp-style bottom sheet ----
+    let sheetChatId = null;
+    const sheet = document.getElementById('action-sheet');
+    const backdrop = document.getElementById('sheet-backdrop');
+    let deleteArmed = false;
+
+    function openSheet(chatId, name, isMuted, isArchived) {
+        sheetChatId = chatId;
+        deleteArmed = false;
+        document.getElementById('sheet-chat-name').textContent = name;
+        document.getElementById('delete-label').textContent = 'Delete';
+        document.getElementById('sheet-mute').querySelector('.mute-label').textContent = isMuted ? 'Unmute' : 'Mute';
+        document.getElementById('sheet-mute').querySelector('.material-symbols-outlined').textContent = isMuted ? 'notifications_active' : 'notifications_off';
+        document.getElementById('sheet-mute').onclick = function() { doAction(isMuted ? 'unmute' : 'mute'); };
+        document.getElementById('sheet-archive').querySelector('.archive-label').textContent = isArchived ? 'Unarchive' : 'Archive';
+        document.getElementById('sheet-archive').querySelector('.material-symbols-outlined').textContent = isArchived ? 'unarchive' : 'archive';
+        document.getElementById('sheet-archive').onclick = function() { doAction(isArchived ? 'unarchive' : 'archive'); };
+        backdrop.classList.remove('hidden');
+        backdrop.classList.remove('backdrop-enter');
+        void backdrop.offsetWidth;
+        backdrop.classList.add('backdrop-enter');
+        sheet.classList.remove('translate-y-full');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSheet() {
+        sheet.classList.add('translate-y-full');
+        backdrop.classList.add('hidden');
+        deleteArmed = false;
+        document.getElementById('delete-label').textContent = 'Delete';
+        document.body.style.overflow = '';
+    }
+
+    function doAction(action) {
+        if (!sheetChatId) return;
+        const form = new FormData();
+        form.append('action', action);
+        form.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+        fetch('/chat/' + sheetChatId + '/action/', {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': '{{ csrf_token }}' },
+            body: form
+        }).then(function() { window.location.reload(); });
+    }
+
+    function confirmDelete() {
+        if (!deleteArmed) {
+            deleteArmed = true;
+            document.getElementById('delete-label').textContent = 'Delete chat?';
+            return;
+        }
+        doAction('delete');
+    }
+
+    document.querySelectorAll('.chat-menu-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            openSheet(btn.dataset.chatId, btn.dataset.chatName, btn.dataset.muted === '1', btn.dataset.archived === '1');
+        });
+    });
+
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeSheet(); });
+
+    applyFilters();
+</script>
+{% endblock %}

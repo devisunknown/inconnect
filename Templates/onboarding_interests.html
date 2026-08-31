@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Onboarding: Interests - InConnect{% endblock %}
+{% block extra_head %}
+<style>
+    .neo-brutal-card { border: 3px solid #000000; box-shadow: 5px 5px 0px 0px rgba(0,0,0,1); transition: all 0.2s ease; }
+    .neo-brutal-card:active { transform: translate(5px, 5px); box-shadow: 0px 0px 0px 0px rgba(0,0,0,1); }
+    .interest-chip { border: 3px solid #000000; box-shadow: 3px 3px 0px 0px rgba(0,0,0,1); transition: all 0.15s ease; cursor: pointer; }
+    .interest-chip.selected { background-color: #96ff00; transform: translate(2px, 2px); box-shadow: 1px 1px 0px 0px rgba(0,0,0,1); }
+</style>
+{% endblock %}
+{% block body_classes %}font-body-md text-on-background antialiased flex items-center justify-center p-4 md:p-8{% endblock %}
+{% block content %}
+<div class="page-enter w-full max-w-md bg-surface rounded-[2rem] border-[3px] border-stroke-black shadow-[15px_15px_0px_0px_rgba(0,0,0,1)] overflow-hidden relative flex flex-col h-[850px] max-h-[795px]">
+    <div class="flex justify-between items-center px-6 pt-4 pb-2 bg-surface z-10 font-label-sm text-label-sm">
+        <span>09:27</span>
+        <div class="flex gap-2">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">signal_cellular_alt</span>
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">wifi</span>
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">battery_full</span>
+        </div>
+    </div>
+    <header class="px-margin-page pt-4 pb-2 bg-surface">
+        <div class="flex justify-between items-center mb-6">
+            <button onclick="history.back()" class="w-12 h-12 rounded-xl border-[3px] border-stroke-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center bg-surface hover:bg-surface-variant active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </button>
+            <span class="font-label-md text-label-md bg-primary-fixed px-3 py-1 border-2 border-stroke-black rounded-full">Step 2 of 3</span>
+        </div>
+        <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-stroke-black mb-2">What are you into?</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">Pick at least 3 interests to personalize your InConnect feed.</p>
+    </header>
+    <main class="flex-1 overflow-y-auto px-margin-page pb-32 pt-2 bg-surface">
+        <form id="interest-form" method="post">
+            {% csrf_token %}
+            <div class="mb-6">
+                <h2 class="font-headline-sm text-headline-sm text-stroke-black mb-4 flex items-center gap-2">
+                    <div class="w-4 h-4 bg-secondary-container border-2 border-stroke-black rounded-sm"></div>
+                    Popular right now
+                </h2>
+                <div class="flex flex-wrap gap-3">
+                    {% for i in interests %}
+                    <div class="interest-chip bg-surface rounded-lg px-4 py-3 flex items-center gap-2" data-value="{{ i.id }}" onclick="toggleChip(this)">
+                        <span class="material-symbols-outlined">{{ i.icon|default:'star' }}</span>
+                        <span class="font-label-md text-label-md">{{ i.name }}</span>
+                    </div>
+                    {% empty %}
+                    <p class="font-body-md text-on-surface-variant">No interests available yet. Check back soon.</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <input type="hidden" name="interests" id="selected-interests"/>
+        </form>
+    </main>
+    <div class="absolute bottom-0 left-0 w-full bg-surface-container border-t-[3px] border-stroke-black p-margin-page pb-8 z-30">
+        <div class="flex justify-between items-center mb-4">
+            <span class="font-label-md text-label-md text-on-surface-variant"><span id="selected-count">0</span> selected</span>
+            <span class="font-label-sm text-label-sm text-error font-bold" id="hint-text">Select at least 3</span>
+        </div>
+        <button onclick="submitInterests()" class="w-full neo-brutal-card bg-primary text-on-primary rounded-xl py-4 flex justify-center items-center gap-2 hover:bg-primary-container">
+            <span class="font-headline-sm text-headline-sm">Continue</span>
+            <span class="material-symbols-outlined">arrow_forward</span>
+        </button>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+let selected = [];
+function toggleChip(el) {
+    const val = el.dataset.value;
+    const idx = selected.indexOf(val);
+    if (idx > -1) { selected.splice(idx, 1); el.classList.remove('selected', 'bg-neon-lime'); }
+    else { selected.push(val); el.classList.add('selected', 'bg-neon-lime'); }
+    document.getElementById('selected-count').textContent = selected.length;
+    document.getElementById('hint-text').textContent = selected.length < 3 ? 'Select at least 3' : '';
+}
+function submitInterests() {
+    if (selected.length < 3) return;
+    document.getElementById('selected-interests').value = selected.join(',');
+    document.getElementById('interest-form').submit();
+}
+</script>
+{% endblock %}
