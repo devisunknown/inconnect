@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
-
+from cloudinary.models import CloudinaryField
 
 class Interest(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -17,7 +17,7 @@ class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
     bio = models.TextField(blank=True)
     interests = models.ManyToManyField(Interest, blank=True, related_name='profiles')
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    avatar = CloudinaryField("image", blank=True, null=True)
     location = models.CharField(max_length=100, blank=True, default='')
     hobbies = models.CharField(max_length=255, blank=True, default='')
     personality = models.CharField(max_length=50, blank=True, default='')
