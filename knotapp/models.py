@@ -22,7 +22,7 @@ class Profile(models.Model):
     hobbies = models.CharField(max_length=255, blank=True, default='')
     personality = models.CharField(max_length=50, blank=True, default='')
     zoom_level = models.PositiveIntegerField(default=100)
-    email_verified = models.BooleanField(default=False)
+    email_verified = models.BooleanField(default=False, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -48,6 +48,11 @@ class Chat(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_group = models.BooleanField(default=False)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['-created_at'], name='chat_created_idx'),
+        ]
+
     def __str__(self):
         return ', '.join(u.username for u in self.participants.all())
 
@@ -65,6 +70,9 @@ class ChatMember(models.Model):
 
     class Meta:
         unique_together = ('chat', 'user')
+        indexes = [
+            models.Index(fields=['user', 'is_archived'], name='chatmember_user_arch_idx'),
+        ]
 
     def __str__(self):
         return f'{self.user.username} in {self.chat_id}'
@@ -84,6 +92,10 @@ class Message(models.Model):
 
     class Meta:
         ordering = ['created_at']
+        indexes = [
+            models.Index(fields=['chat', 'created_at'], name='message_chat_created_idx'),
+            models.Index(fields=['chat', 'is_read'], name='message_chat_read_idx'),
+        ]
 
     def __str__(self):
         return f'{self.sender.username}: {self.content[:30]}'
@@ -96,11 +108,14 @@ class FriendRequest(models.Model):
 
     from_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_requests')
     to_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='received_requests')
-    status = models.CharField(max_length=10, default=STATUS_PENDING)
+    status = models.CharField(max_length=10, default=STATUS_PENDING, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('from_user', 'to_user')
+        indexes = [
+            models.Index(fields=['to_user', 'status'], name='friendreq_to_status_idx'),
+        ]
 
     def __str__(self):
         return f'{self.from_user.username} -> {self.to_user.username} ({self.status})'
@@ -108,7 +123,7 @@ class FriendRequest(models.Model):
 
 class UserPresence(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='presence')
-    is_online = models.BooleanField(default=False)
+    is_online = models.BooleanField(default=False, db_index=True)
     last_seen = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -135,6 +150,9 @@ class Notification(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', 'is_read'], name='notif_user_read_idx'),
+        ]
 
     def __str__(self):
         return f'{self.user.username}: {self.text}'

@@ -5,6 +5,8 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 from .models import Chat, Message, UserPresence
+from .presence import mark_online, mark_offline
+from .unread import increment_unread
 
 SILLY_EMOJIS = ['🤪', '😜', '🥸', '😝', '🤡', '🙃', '😎', '🤓', '🫠', '🤑', '🥴', '😵‍💫', '🫣', '😬', '🧐']
 
@@ -139,7 +141,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def save_message(self, user, content):
         try:
             chat = Chat.objects.get(id=self.chat_id, participants=user)
-            return Message.objects.create(chat=chat, sender=user, content=content)
+            message = Message.objects.create(chat=chat, sender=user, content=content)
+            other_ids = chat.participants.exclude(id=user.id).values_list('id', flat=True)
+            for member_id in other_ids:
+                increment_unread(member_id, chat.id)
+            return message
         except Chat.DoesNotExist:
             return None
 
@@ -151,8 +157,10 @@ class PresenceConsumer(AsyncWebsocketConsumer):
             await self.close()
             return
         self.username = user.username
+        self.user_id = user.id
         await self.channel_layer.group_add(PRESENCE_GROUP, self.channel_name)
-        await self.set_presence(True)
+        mark_online(self.user_id)
+        await self.sync_presence_db(True)
         await self.accept()
         await self.send(text_data=json.dumps({'type': 'presence_update', 'username': self.username, 'online': True}))
         await self.channel_layer.group_send(
@@ -161,7 +169,8 @@ class PresenceConsumer(AsyncWebsocketConsumer):
         )
 
     async def disconnect(self, close_code):
-        await self.set_presence(False)
+        mark_offline(self.user_id)
+        await self.sync_presence_db(False)
         await self.channel_layer.group_send(
             PRESENCE_GROUP,
             {'type': 'presence_update', 'username': self.username, 'online': False},
@@ -171,6 +180,7 @@ class PresenceConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         data = json.loads(text_data)
         if data.get('type') == 'ping':
+            mark_online(self.user_id)  # heartbeat refreshes the Redis TTL
             await self.send(text_data=json.dumps({'type': 'pong'}))
 
     async def presence_update(self, event):
@@ -183,7 +193,7 @@ class PresenceConsumer(AsyncWebsocketConsumer):
         }))
 
     @database_sync_to_async
-    def set_presence(self, online):
+    def sync_presence_db(self, online):
         presence, _ = UserPresence.objects.get_or_create(user=self.scope['user'])
         presence.is_online = online
         presence.save()

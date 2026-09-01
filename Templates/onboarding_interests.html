@@ -8,9 +8,9 @@
     .interest-chip.selected { background-color: #96ff00; transform: translate(2px, 2px); box-shadow: 1px 1px 0px 0px rgba(0,0,0,1); }
 </style>
 {% endblock %}
-{% block body_classes %}font-body-md text-on-background antialiased flex items-center justify-center p-4 md:p-8{% endblock %}
+{% block body_classes %}font-body-md text-on-background antialiased flex items-start md:items-center justify-center p-3 md:p-8 overflow-x-hidden{% endblock %}
 {% block content %}
-<div class="page-enter w-full max-w-md bg-surface rounded-[2rem] border-[3px] border-stroke-black shadow-[15px_15px_0px_0px_rgba(0,0,0,1)] overflow-hidden relative flex flex-col h-[850px] max-h-[795px]">
+<div class="page-enter w-full max-w-md bg-surface rounded-[2rem] border-[3px] border-stroke-black shadow-[15px_15px_0px_0px_rgba(0,0,0,1)] overflow-hidden relative flex flex-col min-h-[100dvh] md:min-h-0 md:h-[850px] md:max-h-[795px]">
     <div class="flex justify-between items-center px-6 pt-4 pb-2 bg-surface z-10 font-label-sm text-label-sm">
         <span>09:27</span>
         <div class="flex gap-2">
@@ -29,7 +29,7 @@
         <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-stroke-black mb-2">What are you into?</h1>
         <p class="font-body-lg text-body-lg text-on-surface-variant">Pick at least 3 interests to personalize your InConnect feed.</p>
     </header>
-    <main class="flex-1 overflow-y-auto px-margin-page pb-32 pt-2 bg-surface">
+    <main class="flex-1 overflow-y-auto px-margin-page pb-36 md:pb-32 pt-2 bg-surface">
         <form id="interest-form" method="post">
             {% csrf_token %}
             <div class="mb-6">
@@ -51,7 +51,7 @@
             <input type="hidden" name="interests" id="selected-interests"/>
         </form>
     </main>
-    <div class="absolute bottom-0 left-0 w-full bg-surface-container border-t-[3px] border-stroke-black p-margin-page pb-8 z-30">
+    <div class="absolute bottom-0 left-0 w-full bg-surface-container border-t-[3px] border-stroke-black p-margin-page pb-[calc(1rem+env(safe-area-inset-bottom))] z-30">
         <div class="flex justify-between items-center mb-4">
             <span class="font-label-md text-label-md text-on-surface-variant"><span id="selected-count">0</span> selected</span>
             <span class="font-label-sm text-label-sm text-error font-bold" id="hint-text">Select at least 3</span>

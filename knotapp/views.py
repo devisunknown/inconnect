@@ -8,7 +8,8 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 from django_ratelimit.decorators import ratelimit
-
+from .presence import bulk_online_status
+from .unread import bulk_unread_counts, clear_unread, invalidate_unread, increment_unread
 from .forms import SignupForm
 from .models import Chat, ChatMember, FriendRequest, Interest, Message, Notification, Profile, UserPresence
 
@@ -183,15 +184,9 @@ def messages_list(request):
             if msg.chat_id not in last_messages:
                 last_messages[msg.chat_id] = msg
 
-    unread_map = {}
-    if chat_ids:
-        for chat_id, cnt in Message.objects.filter(
-            chat_id__in=chat_ids, is_read=False
-        ).exclude(
-            sender=request.user
-        ).values('chat').annotate(cnt=Count('id')).values_list('chat', 'cnt'):
-            unread_map[chat_id] = cnt
-
+    unread_map = bulk_unread_counts(request.user.id, chat_ids) if chat_ids else {}
+    
+    
     total_unread = 0
     for chat in chats:
         chat.last_message = last_messages.get(chat.id)
@@ -221,15 +216,17 @@ def chat_room(request, chat_id):
         content = request.POST.get('message', '').strip()
         if content:
             Message.objects.create(chat=chat, sender=request.user, content=content)
+            if other:
+                increment_unread(other.id, chat.id)
         return redirect('chat_room', chat_id=chat.id)
     chat.messages.filter(is_read=False).exclude(sender=request.user).update(is_read=True)
+    clear_unread(request.user.id, chat.id)
     msgs = chat.messages.select_related('sender')
     return render(request, 'chat.html', {
         'chat': chat,
         'other': other,
         'messages': msgs,
     })
-
 
 @login_required
 def profile(request):
@@ -410,10 +407,7 @@ def user_search(request):
             if other:
                 friend_ids.add(other.id)
 
-        online_ids = set(
-            UserPresence.objects.filter(user_id__in=[u.id for u in users], is_online=True)
-            .values_list('user_id', flat=True)
-        )
+        online_ids = bulk_online_status([u.id for u in users])
 
         for u in users:
             p = getattr(u, 'profile', None)
@@ -460,11 +454,14 @@ def chat_action(request, chat_id):
         member.is_muted = False
         member.save()
     elif action == 'mark_unread':
-        chat.messages.filter(is_read=False).exclude(sender=request.user).update(is_read=True)
-        chat.messages.exclude(sender=request.user).update(is_read=False)
+      chat.messages.filter(is_read=False).exclude(sender=request.user).update(is_read=True)
+      chat.messages.exclude(sender=request.user).update(is_read=False)
+      invalidate_unread(request.user.id, chat.id)
+    
     elif action == 'delete':
         chat.participants.remove(request.user)
         chat.memberships.filter(user=request.user).delete()
+        
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         from django.http import JsonResponse
         return JsonResponse({'ok': True})

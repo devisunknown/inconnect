@@ -9,9 +9,9 @@
     body { background-color: #fcf8ff; background-image: radial-gradient(#dcd8e5 1px, transparent 1px); background-size: 20px 20px; }
 </style>
 {% endblock %}
-{% block body_classes %}bg-background text-on-surface font-body-md antialiased pb-24 md:pb-0{% endblock %}
+{% block body_classes %}bg-background text-on-surface font-body-md antialiased pb-24 md:pb-0 overflow-x-hidden{% endblock %}
 {% block content %}
-<div class="page-enter bg-background text-on-surface font-body-md antialiased pb-24 md:pb-0">
+<div class="page-enter bg-background text-on-surface font-body-md antialiased pb-24 md:pb-0 overflow-x-hidden">
 <header class="bg-surface-container w-full top-0 sticky border-b-[3px] border-stroke-black shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] flex justify-between items-center px-margin-page py-4 z-50 transition-all hidden md:flex">
     <a href="{% url 'matches' %}" class="text-primary hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[5px] active:translate-y-[5px] active:shadow-none transition-all p-2 border-2 border-stroke-black rounded-lg neo-shadow-sm bg-surface">
         <span class="material-symbols-outlined">hub</span>
@@ -26,7 +26,7 @@
     <h1 class="font-headline-sm text-headline-sm font-black text-on-surface">Profile</h1>
     <a href="{% url 'logout' %}" class="p-2 border-2 border-stroke-black rounded-lg neo-shadow-sm bg-surface"><span class="material-symbols-outlined">logout</span></a>
 </header>
-<main class="max-w-4xl mx-auto px-margin-page py-8 space-y-12">
+<main class="max-w-4xl mx-auto px-margin-page py-6 md:py-8 space-y-12">
     <section class="relative">
         <div class="absolute -top-4 -right-4 w-32 h-32 bg-secondary-container rounded-full border-4 border-stroke-black z-0 opacity-80 md:w-48 md:h-48 md:-right-8"></div>
         <div class="relative z-10 bg-surface rounded-xl neo-border neo-shadow p-6 md:p-8 flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8">
@@ -211,7 +211,7 @@
         </div>
     </section>
 </main>
-<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 bg-surface-container-highest border-t-[3px] border-stroke-black z-50 md:hidden">
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 bg-surface-container-highest border-t-[3px] border-stroke-black z-50 md:hidden pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
     <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors rounded-xl" href="{% url 'matches' %}"><span class="material-symbols-outlined">home</span></a>
     <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors rounded-xl" href="{% url 'matches' %}"><span class="material-symbols-outlined">explore</span></a>
     <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors rounded-xl" href="{% url 'messages' %}"><span class="material-symbols-outlined">chat</span></a>

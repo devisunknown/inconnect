@@ -84,6 +84,14 @@ TEMPLATES = [
     },
 ]
 
+
+_csrf_trusted = [origin.strip() for origin in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if origin.strip()]
+if render_host:
+    _csrf_trusted.append(f'https://{render_host}')
+CSRF_TRUSTED_ORIGINS = _csrf_trusted
+
+
+
 WSGI_APPLICATION = 'knot.wsgi.application'
 
 ASGI_APPLICATION = 'knot.asgi.application'
@@ -152,11 +160,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Email
-# ------------------------------------------------------------------
-# Dev defaults to the console backend (prints emails to the terminal).
-# At deploy, override these in .env (e.g. EMAIL_BACKEND=smtp with
-# SMTP_* vars, or a Resend SMTP host) with zero code changes.
+
 _EMAIL_BACKENDS = {
     'smtp': 'django.core.mail.backends.smtp.EmailBackend',
     'console': 'django.core.mail.backends.console.EmailBackend',
@@ -172,8 +176,33 @@ EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'true').lower() in ('1', 'true', 'yes
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'InConnect <noreply@inconnect.app>')
 SITE_BASE_URL = os.getenv('SITE_BASE_URL', 'http://localhost:8000')
 
+
+
+
+REDIS_URL = os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/1')
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': REDIS_URL,
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        },
+        'KEY_PREFIX': 'knot',
+        'TIMEOUT': 300, 
+    }
+}
+
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
+
+
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
-    }
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [REDIS_URL],
+        },
+    },
 }

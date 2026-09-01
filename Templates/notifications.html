@@ -6,7 +6,7 @@
     .neo-brutalism-interaction:active { box-shadow: 0px 0px 0px 0px #000000; transform: translate(5px, 5px); }
 </style>
 {% endblock %}
-{% block body_classes %}bg-surface-off-white text-on-surface font-body-md min-h-screen flex flex-col pb-[80px]{% endblock %}
+{% block body_classes %}bg-surface-off-white text-on-surface font-body-md min-h-screen flex flex-col pb-[88px] md:pb-[80px] overflow-x-hidden{% endblock %}
 {% block content %}
 <div class="page-enter">
 <header class="bg-surface-container w-full top-0 sticky z-50 border-b-[3px] border-stroke-black shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]">
@@ -89,7 +89,7 @@
     {% endif %}
 </main>
 </div>
-<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 bg-surface-container-highest border-t-[3px] border-stroke-black z-50 md:hidden">
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 bg-surface-container-highest border-t-[3px] border-stroke-black z-50 md:hidden pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
     <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors" href="{% url 'matches' %}"><span class="material-symbols-outlined text-primary">home</span></a>
     <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors" href="{% url 'matches' %}"><span class="material-symbols-outlined text-primary">explore</span></a>
     <a class="flex flex-col items-center justify-center text-on-surface p-2 hover:bg-vivid-yellow transition-colors" href="{% url 'messages' %}"><span class="material-symbols-outlined text-primary">chat</span></a>
