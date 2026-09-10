@@ -1,2 +1,5 @@
 .env
 .email template.html
+.opencode
+AGENTS
+.venv

@@ -51,6 +51,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
     'knotapp',
 ]
 
@@ -101,16 +104,22 @@ ASGI_APPLICATION = 'knot.asgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASE_URL = os.getenv('DATABASE_URL')
-if not DATABASE_URL:
-    raise RuntimeError('DATABASE_URL is required. Set it to a PostgreSQL connection string.')
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=DATABASE_URL,
-        conn_max_age=600,
-        ssl_require=not DEBUG,
-    )
-}
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=not DEBUG,
+        )
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
@@ -213,3 +222,22 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
+
+CORS_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:8081').split(',')
+    if origin.strip()
+]
+CORS_ALLOW_CREDENTIALS = True
